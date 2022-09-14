@@ -5,20 +5,30 @@ using UnityEngine.UI;
 
 public static class Cellular
 {
-    static public Vector2Int Size = new(50,50);
+    static public Vector2Int Size = new(50, 50);
     static public int NoiseDensity = 88;
     static public int Neighbors = 6;
     static public int Iterations = 10;
 
-    static public bool[,] GenerateArray()
+    static public bool[,] GenerateArray(int size = 50, int noise = 88, int neighbors = 6, int iterations = 10)
     {
+        Size = new(size, size);
+        NoiseDensity = noise;
+        Neighbors = neighbors;
+        Iterations = iterations;
+
         bool[,] pixels = Create();
         for (int i = 0; i < Iterations; i++)
             pixels = Iterate(pixels);
         return pixels;
     }
-    static public Texture2D GenerateTexture()
+    static public Texture2D GenerateTexture(int size = 50, int noise = 88, int neighbors = 6, int iterations = 10)
     {
+        Size = new(size, size);
+        NoiseDensity = noise;
+        Neighbors = neighbors;
+        Iterations = iterations;
+
         bool[,] pixels = GenerateArray();
         return Texturize(pixels);
     }
@@ -29,7 +39,8 @@ public static class Cellular
         {
             for (int y = 0; y < pixels.GetLength(1); y++)
             {
-                pixels[x, y] = Random.Range(0, 100) < NoiseDensity;
+                float dis = Vector2Int.Distance(new Vector2Int(x, y), new Vector2Int(Size.x/2, Size.y/2));
+                pixels[x, y] = Random.Range(0, 100) < NoiseDensity - dis;
             }
         }
         return pixels;

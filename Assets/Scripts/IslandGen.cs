@@ -10,7 +10,7 @@ public class IslandGen : MonoBehaviour
     rendering time. seems to work perfectly fine with the current setup so currently set on the backburner.
      */
 
-
+    internal bool[,] PlaceableArea;
     [Header("Generation settings")]
     [SerializeField] private int _cubesToPreload;
     [SerializeField] private int Size = 50;
@@ -90,6 +90,7 @@ public class IslandGen : MonoBehaviour
             }
         }
         yield return new WaitForEndOfFrame();
+        PlaceableArea = maps[maps.Count - 1];
     }
     /// <summary>
     /// Returning a cube, Making sure to instantiate if there's no avaliable inactive cubes

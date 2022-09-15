@@ -123,6 +123,53 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &243591823
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 243591824}
+  - component: {fileID: 243591825}
+  m_Layer: 0
+  m_Name: TestingController
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &243591824
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 243591823}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 3
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &243591825
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 243591823}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 976e69585d2f5f342b1a1513b50f9248, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _islandGen: {fileID: 264845335}
+  _objectGen: {fileID: 264845337}
+  _explosionPrefab: {fileID: 1874454068450570211, guid: 275ca2683e946dc42a34e95cecbefb75, type: 3}
 --- !u!1 &264845334
 GameObject:
   m_ObjectHideFlags: 0
@@ -160,8 +207,8 @@ MonoBehaviour:
   Neighbors: 5
   Iterations: 6
   _cubePrefab: {fileID: 3565617082097576659, guid: 7b7066fb3c27d5949ac6a80c3fcd665b, type: 3}
-  _topMaterial: {fileID: 2100000, guid: 534f4929f7378314aacc4323fb673f3c, type: 2}
-  _botMaterial: {fileID: 2100000, guid: 294098e487c2f244fbf9692b1d000c53, type: 2}
+  _topMaterial: {fileID: 2100000, guid: cc398b9bfeeb64b499e22de4950a9f0e, type: 2}
+  _botMaterial: {fileID: 2100000, guid: 04b58bca9c90eae45b3ff3c30fdc52f7, type: 2}
 --- !u!4 &264845336
 Transform:
   m_ObjectHideFlags: 0
@@ -173,8 +220,7 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 1290646820}
+  m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -190,6 +236,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dda6fa44328cd7349a3f2c8613ed7773, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _objects:
+  - Name: Barrel
+    Prefab: {fileID: 576150762740661281, guid: 629cac98301e8a545b58b4f7d6a6b898, type: 3}
+    Size: {x: 1, y: 1, z: 1}
+    Amount: 10
+  - Name: HealthPack
+    Prefab: {fileID: 5401020676975986223, guid: b6fc0563d4c91d94c9f1610f4957637e, type: 3}
+    Size: {x: 1, y: 1, z: 1}
+    Amount: 10
+  - Name: Mine
+    Prefab: {fileID: 4972194456566260600, guid: eedf620ad67a31846ba8547904137bda, type: 3}
+    Size: {x: 1, y: 1, z: 1}
+    Amount: 5
 --- !u!1 &769063377
 GameObject:
   m_ObjectHideFlags: 0
@@ -201,6 +260,7 @@ GameObject:
   - component: {fileID: 769063380}
   - component: {fileID: 769063379}
   - component: {fileID: 769063378}
+  - component: {fileID: 769063381}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -241,8 +301,8 @@ Camera:
     height: 1
   near clip plane: 0.3
   far clip plane: 1000
-  field of view: 125
-  orthographic: 1
+  field of view: 60
+  orthographic: 0
   orthographic size: 30
   m_Depth: -1
   m_CullingMask:
@@ -266,14 +326,27 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 769063377}
-  m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 0, y: 10, z: 0}
+  m_LocalRotation: {x: 0.30070576, y: 0, z: 0, w: 0.953717}
+  m_LocalPosition: {x: 0, y: 20, z: -40}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 35, y: 0, z: 0}
+--- !u!114 &769063381
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 769063377}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e15a316e07961d409c7c951434cb23b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _rotationSpeed: 10
 --- !u!1 &1290646816
 GameObject:
   m_ObjectHideFlags: 0
@@ -287,7 +360,7 @@ GameObject:
   - component: {fileID: 1290646818}
   - component: {fileID: 1290646817}
   m_Layer: 0
-  m_Name: Plane
+  m_Name: Water
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -301,10 +374,10 @@ MeshCollider:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1290646816}
   m_Material: {fileID: 0}
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 4
-  m_Convex: 0
+  m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!23 &1290646818
@@ -327,7 +400,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: fbd28ea502fd8024bb2277a547a6e424, type: 2}
+  - {fileID: 2100000, guid: ee564e4990700c04ba1fac7619eced7b, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -366,11 +439,11 @@ Transform:
   m_GameObject: {fileID: 1290646816}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 15, y: 1, z: 15}
+  m_LocalScale: {x: 50, y: 1, z: 50}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 264845336}
-  m_RootOrder: 0
+  m_Father: {fileID: 0}
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1902447925
 GameObject:

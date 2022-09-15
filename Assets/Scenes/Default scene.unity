@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.18028352, g: 0.22571376, b: 0.30692244, a: 1}
+  m_IndirectSpecularColor: {r: 0.18028378, g: 0.22571412, b: 0.30692285, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -152,11 +152,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b596d2c4f9e2bb440b9c6320a0740a5f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Size: 75
-  NoiseDensity: 98
-  Neighbors: 6
+  Size: 50
+  NoiseDensity: 86
+  Neighbors: 5
   Iterations: 6
+  Layers: 3
+  _cubesToPreload: 5000
   _cubePrefab: {fileID: 3565617082097576659, guid: 7b7066fb3c27d5949ac6a80c3fcd665b, type: 3}
+  _topMaterial: {fileID: 2100000, guid: 534f4929f7378314aacc4323fb673f3c, type: 2}
+  _botMaterial: {fileID: 2100000, guid: 294098e487c2f244fbf9692b1d000c53, type: 2}
 --- !u!4 &264845336
 Transform:
   m_ObjectHideFlags: 0

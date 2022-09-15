@@ -12,7 +12,7 @@ public static class Cellular
 
     static public bool[,] GenerateArray(int size = 50, int noise = 88, int neighbors = 6, int iterations = 10)
     {
-        Size = new(size, size);
+        Size = new(size+25, size+25);
         NoiseDensity = noise;
         Neighbors = neighbors;
         Iterations = iterations;
@@ -39,7 +39,7 @@ public static class Cellular
         {
             for (int y = 0; y < pixels.GetLength(1); y++)
             {
-                float dis = Vector2Int.Distance(new Vector2Int(x, y), new Vector2Int(Size.x/2, Size.y/2));
+                float dis = Vector2Int.Distance(new Vector2Int(x, y), new Vector2Int(Size.x/2, Size.y/2))/(Size.x*0.01f);
                 pixels[x, y] = Random.Range(0, 100) < NoiseDensity - dis;
             }
         }

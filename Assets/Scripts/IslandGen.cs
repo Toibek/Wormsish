@@ -2,8 +2,15 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Mapgen : MonoBehaviour
+public class IslandGen : MonoBehaviour
 {
+    /*
+     For future reference-
+    If there's anything missing from this it's to optimize the cubes themselves in order to make it take up less
+    rendering time. seems to work perfectly fine with the current setup so currently set on the backburner.
+     */
+
+
     [Header("Generation settings")]
     [SerializeField] private int _cubesToPreload;
     [SerializeField] private int Size = 50;
@@ -19,47 +26,50 @@ public class Mapgen : MonoBehaviour
     List<GameObject> _inactiveCubes = new List<GameObject>();
     List<GameObject> _activeCubes = new List<GameObject>();
 
-    Coroutine GenRoutine;
-    Coroutine preLoadRoutine;
+    private Coroutine preLoadRoutine;
     private void Start()
     {
         preLoadRoutine = StartCoroutine(PreloadCubes());
     }
     /// <summary>
-    /// Publiciced way to start the map generation
+    /// Preloading cubes and saving them as inactive so that it can be fetched without needing to instantiate.
     /// </summary>
-    /// <returns>Wether or not the coroutine could start</returns>
-    public bool GenerateMap()
+    private IEnumerator PreloadCubes()
     {
-        if (preLoadRoutine != null)
+        for (int i = 0; i < _cubesToPreload; i++)
         {
-            StopCoroutine(preLoadRoutine);
-            preLoadRoutine = null;
+            GameObject go = Instantiate(_cubePrefab, transform);
+            _inactiveCubes.Add(go);
+            go.SetActive(false);
+            if (i % 20 == 0)
+                yield return new WaitForEndOfFrame();
         }
-
-        if (GenRoutine == null)
-        {
-            GenRoutine = StartCoroutine(GenerationRoutine());
-            return true;
-        }
-        else
-            return false;
     }
     /// <summary>
     /// A coroutine to create the base level, allowing for breaks in the creation.
     /// </summary>
     /// <returns></returns>
-    IEnumerator GenerationRoutine()
+    public IEnumerator GenerationRoutine()
     {
+        //Stop preloading if it's active
+        if (preLoadRoutine != null)
+        {
+            StopCoroutine(preLoadRoutine);
+            preLoadRoutine = null;
+        }
+        //Remove active cubes
         for (int i = _activeCubes.Count - 1; i >= 0; i--)
             RemoveCube(_activeCubes[i]);
-        yield return new WaitForSeconds(0.5f);
-
+        yield return new WaitForEndOfFrame();
+        //Get the base maps from the Cellular automata generator
         List<bool[,]> maps = new List<bool[,]>();
         maps.Add(Cellular.GenerateArray(Size, NoiseDensity, Neighbors, Iterations));
         for (int i = 0; i < Layers; i++)
+        {
             maps.Add(Cellular.Iterate(maps[maps.Count - 1]));
-
+            yield return new WaitForEndOfFrame();
+        }
+        //Place the cubes in the enabled positions
         Vector3Int offset = new(-maps[0].GetLength(0) / 2, 0, -maps[0].GetLength(1) / 2);
         for (int i = 0; i < maps.Count; i++)
         {
@@ -80,21 +90,6 @@ public class Mapgen : MonoBehaviour
             }
         }
         yield return new WaitForEndOfFrame();
-        GenRoutine = null;
-    }
-    /// <summary>
-    /// Preloading cubes and saving them as inactive so that it can be fetched without needing to instantiate.
-    /// </summary>
-    IEnumerator PreloadCubes()
-    {
-        for (int i = 0; i < _cubesToPreload; i++)
-        {
-            GameObject go = Instantiate(_cubePrefab, transform);
-            _inactiveCubes.Add(go);
-            go.SetActive(false);
-            if (i % 20 == 0)
-                yield return new WaitForEndOfFrame();
-        }
     }
     /// <summary>
     /// Returning a cube, Making sure to instantiate if there's no avaliable inactive cubes
@@ -103,8 +98,10 @@ public class Mapgen : MonoBehaviour
     /// <returns>the spawned cube</returns>
     public GameObject GetCube(Vector3 position)
     {
+        //check wether or not there's inactive cubes saved
         if (_inactiveCubes.Count > 0)
         {
+            //Get a inactive cube to activate and place
             GameObject go = _inactiveCubes[0];
             go.transform.position = position;
             go.SetActive(true);
@@ -114,6 +111,7 @@ public class Mapgen : MonoBehaviour
         }
         else
         {
+            //Create and place a new cube
             GameObject go = Instantiate(_cubePrefab, position, Quaternion.identity, transform);
             _activeCubes.Add(go);
             return go;
@@ -125,6 +123,7 @@ public class Mapgen : MonoBehaviour
     /// <param name="cube">The cube to remove</param>
     public void RemoveCube(GameObject cube)
     {
+        //hide and save the cube
         _activeCubes.Remove(cube);
         cube.SetActive(false);
         _inactiveCubes.Add(cube);

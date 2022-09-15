@@ -133,6 +133,7 @@ GameObject:
   m_Component:
   - component: {fileID: 264845336}
   - component: {fileID: 264845335}
+  - component: {fileID: 264845337}
   m_Layer: 0
   m_Name: MapGenerator
   m_TagString: Untagged
@@ -152,12 +153,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b596d2c4f9e2bb440b9c6320a0740a5f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _cubesToPreload: 5000
   Size: 50
+  Layers: 3
   NoiseDensity: 86
   Neighbors: 5
   Iterations: 6
-  Layers: 3
-  _cubesToPreload: 5000
   _cubePrefab: {fileID: 3565617082097576659, guid: 7b7066fb3c27d5949ac6a80c3fcd665b, type: 3}
   _topMaterial: {fileID: 2100000, guid: 534f4929f7378314aacc4323fb673f3c, type: 2}
   _botMaterial: {fileID: 2100000, guid: 294098e487c2f244fbf9692b1d000c53, type: 2}
@@ -172,10 +173,23 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 1290646820}
   m_Father: {fileID: 0}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &264845337
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 264845334}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dda6fa44328cd7349a3f2c8613ed7773, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &769063377
 GameObject:
   m_ObjectHideFlags: 0
@@ -350,13 +364,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1290646816}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 15, y: 1, z: 15}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 3
+  m_Father: {fileID: 264845336}
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1902447925
 GameObject:

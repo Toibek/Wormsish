@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.18028378, g: 0.22571412, b: 0.30692285, a: 1}
+  m_IndirectSpecularColor: {r: 0.18028352, g: 0.22571376, b: 0.30692244, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -240,7 +240,7 @@ MonoBehaviour:
   - Name: Barrel
     Prefab: {fileID: 576150762740661281, guid: 629cac98301e8a545b58b4f7d6a6b898, type: 3}
     Size: {x: 1, y: 1, z: 1}
-    Amount: 10
+    Amount: 50
   - Name: HealthPack
     Prefab: {fileID: 5401020676975986223, guid: b6fc0563d4c91d94c9f1610f4957637e, type: 3}
     Size: {x: 1, y: 1, z: 1}

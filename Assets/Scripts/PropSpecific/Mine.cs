@@ -17,10 +17,11 @@ public class Mine : MonoBehaviour
             _activeRoutine = StartCoroutine(Triggered());
         }
     }
-    private void OnTriggerEnter2D(Collider2D collision)
+    private void OnTriggerEnter(Collider other)
     {
-        if (collision.CompareTag("Player") && _activeRoutine == null)
+        if (other.CompareTag("Player") && _activeRoutine == null)
         {
+            Debug.Log("Should explode");
             _activeRoutine = StartCoroutine(Triggered());
         }
     }
@@ -28,9 +29,9 @@ public class Mine : MonoBehaviour
     {
         for (int i = 0; i < _delay; i++)
         {
-            //beepnoise
-            yield return new WaitForSeconds(1);
             GetComponent<Rigidbody>().AddForce(new(0, _jumpForce, 0));
+            yield return new WaitForSeconds(1);
+            //beepnoise
         }
         Instantiate(_explosionPrefab, transform.position, Quaternion.identity);
         Destroy(gameObject);

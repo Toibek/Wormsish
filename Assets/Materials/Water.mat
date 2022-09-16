@@ -49,8 +49,9 @@ Material:
     m_Floats:
     - _BUILTIN_QueueControl: 0
     - _BUILTIN_QueueOffset: -1
-    - _Density: 50
-    - _FoamSpeed: 0.01
+    - _Density: 0.1
+    - _FoamDensity: 2000
+    - _FoamSpeed: 0.0003
     - _Multi: 0.4
     - _Offset: 0.5
     - _QueueControl: 0
@@ -58,7 +59,7 @@ Material:
     - _Speed: 1
     - _Thicknes: 31
     m_Colors:
-    - _Base: {r: 0.18796723, g: 0.37354013, b: 0.754717, a: 1}
+    - _Base: {r: 0.019607844, g: 0.18431373, b: 0.37254903, a: 1}
     - _rippleColor: {r: 0, g: 0.4437736, b: 0.4528302, a: 1}
   m_BuildTextureStacks: []
 --- !u!114 &7746082858474267542

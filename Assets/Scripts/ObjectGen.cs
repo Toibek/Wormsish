@@ -36,6 +36,7 @@ public class ObjectGen : MonoBehaviour
     }
     public List<GameObject> More(string name, int amount)
     {
+        Debug.Log("Spawning: " + amount + " " + name);
         SpawnableObject obj = _objects[0];
         for (int i = 0; i < _objects.Length; i++)
         {

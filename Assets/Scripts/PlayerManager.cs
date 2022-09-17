@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using Cinemachine;
 
 public class PlayerManager : MonoBehaviour
 {
@@ -9,12 +10,18 @@ public class PlayerManager : MonoBehaviour
     public int TeamSize;
     [SerializeField] private GameObject _UnitPrefab;
     [SerializeField] private ObjectGen _objectGen;
+    [SerializeField] private CinemachineVirtualCamera _OrbitCam;
+    [SerializeField] private CinemachineVirtualCamera _FollowCam;
 
     private Movement _activeUnit;
     private Movement[,] _units;
     private Vector2Int _activePlace;
 
-
+    private void Start()
+    {
+        _OrbitCam.Priority = 1;
+        _FollowCam.Priority = 0;
+    }
     public void Move(InputAction.CallbackContext context)
     {
         if (context.started)
@@ -45,12 +52,14 @@ public class PlayerManager : MonoBehaviour
                 if (_activePlace.x + 1 >= Teams)
                     _activePlace = new(0, 0);
                 else
-                    _activePlace = new(_activePlace.x, 0);
+                    _activePlace = new(_activePlace.x+1, 0);
             }
             else
                 _activePlace += new Vector2Int(0, 1);
             _activeUnit = _units[_activePlace.x, _activePlace.y];
             _activeUnit.transform.GetChild(1).gameObject.SetActive(true);
+            _FollowCam.LookAt = _activeUnit.transform;
+            _FollowCam.Follow = _activeUnit.transform;
         }
     }
     public IEnumerator SpawnPlayers()
@@ -60,11 +69,12 @@ public class PlayerManager : MonoBehaviour
         int n = Teams * TeamSize;
         if (spawnPoints.Count < n)
         {
-            spawnPoints.AddRange(_objectGen.More("Spawner", spawnPoints.Count - n));
+            Debug.Log("Asking for more respawn points");
+            spawnPoints.AddRange(_objectGen.More("Spawner", n - spawnPoints.Count));
         }
 
 
-        _units = new Movement[Teams, Mathf.FloorToInt(spawnPoints.Count / Teams)];
+        _units = new Movement[Teams, TeamSize];
         for (int team = 0; team < Teams; team++)
         {
             for (int unit = 0; unit < TeamSize; unit++)
@@ -81,5 +91,9 @@ public class PlayerManager : MonoBehaviour
         _activeUnit = _units[0, 0];
         _activePlace = new(0, 0);
         _activeUnit.transform.GetChild(1).gameObject.SetActive(true);
+        _FollowCam.LookAt = _activeUnit.transform;
+        _FollowCam.Follow = _activeUnit.transform;
+        _FollowCam.m_Priority = 1;
+        _OrbitCam.Priority = 0;
     }
 }

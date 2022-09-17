@@ -6,6 +6,7 @@ public class TestingController : MonoBehaviour
 {
     [SerializeField] private IslandGen _islandGen;
     [SerializeField] private ObjectGen _objectGen;
+    [SerializeField] private PlayerManager _playerManager;
     [SerializeField] private GameObject _explosionPrefab;
     private void Start()
     {
@@ -17,7 +18,8 @@ public class TestingController : MonoBehaviour
         bool[,] placeable = _islandGen.PlaceableArea;
         Debug.Log(placeable);
         yield return StartCoroutine(_objectGen.GenerateObjects(placeable));
-
+        yield return new WaitForSeconds(2);
+        yield return StartCoroutine(_playerManager.SpawnPlayers());
         Debug.Log("Generation complete");
     }
 

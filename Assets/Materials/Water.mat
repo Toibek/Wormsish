@@ -50,10 +50,10 @@ Material:
     - _BUILTIN_QueueControl: 0
     - _BUILTIN_QueueOffset: -1
     - _Density: 0.1
-    - _FoamDensity: 2000
-    - _FoamSpeed: 0.0003
-    - _Multi: 0.4
-    - _Offset: 0.5
+    - _FoamDensity: 1000
+    - _FoamSpeed: 0.0002
+    - _Multi: 0.6
+    - _Offset: 0.71
     - _QueueControl: 0
     - _QueueOffset: 0
     - _Speed: 1

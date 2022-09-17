@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 576150762740661726}
   - component: {fileID: 576150762740661727}
   - component: {fileID: 576150762740661724}
+  - component: {fileID: 1028317734687876500}
   m_Layer: 0
   m_Name: Barrel
   m_TagString: Untagged
@@ -44,10 +45,10 @@ CapsuleCollider:
   m_Material: {fileID: 0}
   m_IsTrigger: 0
   m_Enabled: 1
-  m_Radius: 0.56
-  m_Height: 1.69
+  m_Radius: 0.5088093
+  m_Height: 1.4200499
   m_Direction: 1
-  m_Center: {x: 0, y: 0.3, z: 0}
+  m_Center: {x: 0.0026009083, y: 0.18423569, z: 0}
 --- !u!114 &576150762740661724
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -62,6 +63,22 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _maxHealth: 2
   _prefabExplosion: {fileID: 1874454068450570211, guid: cbff4268fcc516645a3c013b25c567e3, type: 3}
+--- !u!54 &1028317734687876500
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 576150762740661281}
+  serializedVersion: 2
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 122
+  m_CollisionDetection: 0
 --- !u!1001 &576150762014717257
 PrefabInstance:
   m_ObjectHideFlags: 0

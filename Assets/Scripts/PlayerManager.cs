@@ -8,58 +8,127 @@ public class PlayerManager : MonoBehaviour
 {
     public int Teams;
     public int TeamSize;
-    [SerializeField] private GameObject _UnitPrefab;
+    public int Moves;
+    public int Specials;
+    [Space]
+    [SerializeField] private GameObject _unitPrefab;
     [SerializeField] private ObjectGen _objectGen;
-    [SerializeField] private CinemachineVirtualCamera _OrbitCam;
-    [SerializeField] private CinemachineVirtualCamera _FollowCam;
+    [SerializeField] private CinemachineVirtualCamera _orbitCam;
+    [SerializeField] private CinemachineVirtualCamera _followCam;
+    [Space]
+    [SerializeField] private Transform _movesHolder;
+    [SerializeField] private Transform _specialsHolder;
 
     private Movement _activeUnit;
     private Movement[,] _units;
     private Vector2Int _activePlace;
 
+    private int _currentMoves;
+    private int _currentSpecials;
+
+    private Coroutine _continousMoveRoutine;
+    private Vector2 moveDirection;
+    private bool _cameraActive;
     private void Start()
     {
-        _OrbitCam.Priority = 1;
-        _FollowCam.Priority = 0;
+        _orbitCam.Priority = 1;
+        _followCam.Priority = 0;
     }
     public void Move(InputAction.CallbackContext context)
     {
         if (context.started)
         {
-            Debug.Log("Performed: " + context.ReadValueAsObject());
-            _activeUnit.Move((Vector2)context.ReadValueAsObject());
+            if (_continousMoveRoutine == null)
+                _continousMoveRoutine = StartCoroutine(ContinousMoving());
+            moveDirection = (Vector2)context.ReadValueAsObject();
         }
         else if (context.canceled)
         {
-            Debug.Log("Canceled: " + context.ReadValueAsObject());
+            StopCoroutine(_continousMoveRoutine);
+            _continousMoveRoutine = null;
+        }
+    }
+    IEnumerator ContinousMoving()
+    {
+        while (true)
+        {
+            yield return new WaitForEndOfFrame();
+            if (_currentMoves > 0 && _activeUnit.Move(moveDirection))
+            {
+                if (--_currentMoves == 0 && _currentSpecials == 0)
+                {
+                    Invoke(nameof(ChangeUnit), 1);
+                    StopCoroutine(_continousMoveRoutine);
+                }
+                for (int i = 0; i < _specialsHolder.childCount; i++)
+                {
+                    _specialsHolder.GetChild(i).GetChild(0).gameObject.SetActive(i < _currentSpecials);
+                }
+                for (int i = 0; i < _movesHolder.childCount; i++)
+                {
+                    _movesHolder.GetChild(i).GetChild(0).gameObject.SetActive(i < _currentMoves);
+                }
+            }
         }
     }
     public void Look(InputAction.CallbackContext context)
     {
-
+        if(context.performed && _cameraActive)
+            _activeUnit.Rotation();
     }
-    public void Fire(InputAction.CallbackContext context)
+    public void Primary(InputAction.CallbackContext context)
     {
 
     }
-    public void SwitchWeapon(InputAction.CallbackContext context)
+    public void Secondary(InputAction.CallbackContext context)
     {
         if (context.started)
         {
-            _activeUnit.transform.GetChild(1).gameObject.SetActive(false);
-            if (_activePlace.y + 1 >= TeamSize)
-            {
-                if (_activePlace.x + 1 >= Teams)
-                    _activePlace = new(0, 0);
-                else
-                    _activePlace = new(_activePlace.x+1, 0);
-            }
+            _followCam.GetComponent<CinemachineInputProvider>().enabled = true;
+            _cameraActive = true;
+        }
+        if (context.canceled)
+        {
+            _followCam.GetComponent<CinemachineInputProvider>().enabled = false;
+            _cameraActive = false;
+        }
+    }
+    public void SwitchWeapon(InputAction.CallbackContext context)
+    {
+
+    }
+    public void PassTurn(InputAction.CallbackContext context)
+    {
+        if (context.started)
+            ChangeUnit();
+    }
+    public void ChangeUnit()
+    {
+        _activeUnit.transform.GetChild(1).gameObject.SetActive(false);
+        if (_activePlace.y + 1 >= TeamSize)
+        {
+            if (_activePlace.x + 1 >= Teams)
+                _activePlace = new(0, 0);
             else
-                _activePlace += new Vector2Int(0, 1);
-            _activeUnit = _units[_activePlace.x, _activePlace.y];
-            _activeUnit.transform.GetChild(1).gameObject.SetActive(true);
-            _FollowCam.LookAt = _activeUnit.transform;
-            _FollowCam.Follow = _activeUnit.transform;
+                _activePlace = new(_activePlace.x + 1, 0);
+        }
+        else
+            _activePlace += new Vector2Int(0, 1);
+        _activeUnit = _units[_activePlace.x, _activePlace.y];
+        _activeUnit.transform.GetChild(1).gameObject.SetActive(true);
+        _followCam.LookAt = _activeUnit.transform;
+        _followCam.Follow = _activeUnit.transform;
+        _activeUnit.CamTransform = _followCam.transform;
+        _currentMoves = Moves;
+        _currentSpecials = Specials;
+
+        for (int i = 0; i < _specialsHolder.childCount; i++)
+        {
+            _specialsHolder.GetChild(i).GetChild(0).gameObject.SetActive(i < _currentSpecials);
+        }
+        for (int i = 0; i < _movesHolder.childCount; i++)
+        {
+            _movesHolder.GetChild(i).GetChild(0).gameObject.SetActive(i < _currentMoves);
         }
     }
     public IEnumerator SpawnPlayers()
@@ -80,7 +149,7 @@ public class PlayerManager : MonoBehaviour
             for (int unit = 0; unit < TeamSize; unit++)
             {
                 int r = Random.Range(0, spawnPoints.Count);
-                GameObject go = Instantiate(_UnitPrefab, spawnPoints[r].transform.position, Quaternion.identity);
+                GameObject go = Instantiate(_unitPrefab, spawnPoints[r].transform.position, Quaternion.identity);
                 Destroy(spawnPoints[r]);
                 spawnPoints.RemoveAt(r);
 
@@ -88,12 +157,39 @@ public class PlayerManager : MonoBehaviour
                 yield return new WaitForEndOfFrame();
             }
         }
+        for (int i = spawnPoints.Count - 1; i >= 0; i--)
+        {
+            Destroy(spawnPoints[i]);
+            spawnPoints.RemoveAt(i);
+        }
         _activeUnit = _units[0, 0];
         _activePlace = new(0, 0);
         _activeUnit.transform.GetChild(1).gameObject.SetActive(true);
-        _FollowCam.LookAt = _activeUnit.transform;
-        _FollowCam.Follow = _activeUnit.transform;
-        _FollowCam.m_Priority = 1;
-        _OrbitCam.Priority = 0;
+        _followCam.LookAt = _activeUnit.transform;
+        _followCam.Follow = _activeUnit.transform;
+        _followCam.m_Priority = 1;
+        _orbitCam.Priority = 0;
+        _activeUnit.CamTransform = _followCam.transform;
+        _currentMoves = Moves;
+        _currentSpecials = Specials;
+
+
+        GameObject UiRef = _specialsHolder.GetChild(0).gameObject;
+        for (int i = 1; i < Specials; i++)
+            Instantiate(UiRef, _specialsHolder);
+        for (int i = 0; i < _specialsHolder.childCount; i++)
+        {
+            _specialsHolder.GetChild(i).GetChild(0).gameObject.SetActive(i < _currentSpecials);
+        }
+        _specialsHolder.gameObject.SetActive(true);
+
+        UiRef = _movesHolder.GetChild(0).gameObject;
+        for (int i = 1; i < Moves; i++)
+            Instantiate(UiRef, _movesHolder);
+        for (int i = 0; i < _movesHolder.childCount; i++)
+        {
+            _movesHolder.GetChild(i).GetChild(0).gameObject.SetActive(i < _currentMoves);
+        }
+        _movesHolder.gameObject.SetActive(true);
     }
 }

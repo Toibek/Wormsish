@@ -4,38 +4,61 @@ using UnityEngine;
 
 public class Movement : MonoBehaviour
 {
+    public Transform CamTransform;
 
     [SerializeField] LayerMask _layerMask;
     [SerializeField] int _jumpHeight;
     [SerializeField] float _liftHeight;
     [SerializeField] float _moveTime;
     Vector3 _startPosition = Vector3.zero;
-    float _height = 1;
     Vector3 _endPosition = Vector3.forward;
     Coroutine _moveRoutine;
-    public void Move(Vector2 direction)
+    public bool Move(Vector2 direction)
     {
+        bool ret = false;
+
+        Vector3 movement = Vector3.zero;
+        Vector3 camForward = CamTransform.forward;
+        camForward.y = 0;
+        movement += camForward * direction.y;
+
+        Vector3 camRight = CamTransform.right;
+        camRight.y = 0;
+        movement += camRight * direction.x;
+
+        movement.Normalize();
+        movement.x = Mathf.Round(movement.x);
+        movement.z = Mathf.Round(movement.z);
+
         if (_moveRoutine == null)
-            _moveRoutine = StartCoroutine(MoveIE(direction));
-    }
-    IEnumerator MoveIE(Vector2 dir)
-    {
-        Vector3 moveDir = new(Mathf.Clamp(dir.x, -1, 1), 0, Mathf.Clamp(dir.y, -1, 1));
-        _startPosition = transform.position;
-        Ray heightCheckRay = new(transform.position + new Vector3(0, _jumpHeight, 0), moveDir);
-        Debug.DrawRay(heightCheckRay.origin, heightCheckRay.direction);
-        if (!Physics.Raycast(heightCheckRay, 1f, _layerMask))
         {
-            Ray positioningRay = new(transform.position + moveDir + Vector3.up * 3, Vector3.down);
-            Debug.Log(positioningRay.origin);
-            Debug.DrawRay(positioningRay.origin, positioningRay.direction + new Vector3(0, -1, 0) * 20);
-            if (Physics.Raycast(positioningRay, out RaycastHit hit, 20))
+
+            _startPosition = transform.position;
+            _endPosition = transform.position;
+            Ray heightCheckRay = new(transform.position + new Vector3(0, _jumpHeight, 0), movement);
+            if (!Physics.Raycast(heightCheckRay, 1f, _layerMask))
             {
-                _endPosition = hit.point + new Vector3(0, .5f, 0);
+                Ray positioningRay = new(transform.position + movement + Vector3.up * 3, Vector3.down);
+                Debug.DrawRay(positioningRay.origin, positioningRay.direction + new Vector3(0, -1, 0) * 20);
+                if (Physics.Raycast(positioningRay, out RaycastHit hit, 20, _layerMask, queryTriggerInteraction: QueryTriggerInteraction.Ignore))
+                {
+                    _endPosition = hit.point + new Vector3(0, .5f, 0);
+                    ret = true;
+                }
             }
+            _moveRoutine = StartCoroutine(MoveIE());
         }
-        _height = Mathf.Max(_startPosition.y, _endPosition.y) - 1f;
-        Vector3 half = Vector3.MoveTowards(_startPosition, _endPosition, Vector3.Distance(_startPosition, _endPosition) * 0.5f);
+        return ret;
+    }
+    public void Rotation()
+    {
+        Vector3 dif = (transform.position - CamTransform.position).normalized;
+        float rot = Mathf.Atan2(dif.x, dif.z) * Mathf.Rad2Deg;
+        rot = Mathf.Round(rot / 45)*45;
+        transform.rotation = Quaternion.Euler(0, rot , 0);
+    }
+    IEnumerator MoveIE()
+    {
         for (float f = 0; f < _moveTime; f += Time.deltaTime)
         {
             Vector3 pos =
@@ -50,14 +73,14 @@ public class Movement : MonoBehaviour
         transform.position = _endPosition;
         _moveRoutine = null;
     }
-    private void OnDrawGizmos()
+    private void OnDrawGizmosSelected()
     {
         for (float f = 0; f < 1; f += 0.05f)
         {
             Vector3 pos =
                 Mathf.Pow(1 - f, 2) * _startPosition +
-                2 * Mathf.Pow(1 - f, 2) * f * (_startPosition + new Vector3(0, _height)) +
-                2 * (1 - f) * Mathf.Pow(f, 2) * (_endPosition + new Vector3(0, _height)) +
+                2 * Mathf.Pow(1 - f, 2) * f * (_startPosition + new Vector3(0, _liftHeight)) +
+                2 * (1 - f) * Mathf.Pow(f, 2) * (_endPosition + new Vector3(0, _liftHeight)) +
                 Mathf.Pow(f, 2) * _endPosition;
             Gizmos.DrawSphere(pos, 0.25f);
         }

@@ -16,27 +16,9 @@ public class TestingController : MonoBehaviour
     {
         yield return StartCoroutine(_islandGen.GenerationRoutine());
         bool[,] placeable = _islandGen.PlaceableArea;
-        Debug.Log(placeable);
         yield return StartCoroutine(_objectGen.GenerateObjects(placeable));
         yield return new WaitForSeconds(2);
         yield return StartCoroutine(_playerManager.SpawnPlayers());
         Debug.Log("Generation complete");
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        if (Input.GetMouseButtonDown(0))
-        {
-            if(Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out RaycastHit hit))
-            {
-                //Instantiate(_explosionPrefab, hit.point, Quaternion.identity);
-                if (hit.transform.GetComponent<Damageable>())
-                {
-                    Damageable d = hit.transform.GetComponent<Damageable>();
-                    d.Damage(100);
-                }
-            }
-        }
     }
 }

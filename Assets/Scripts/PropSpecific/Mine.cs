@@ -21,7 +21,6 @@ public class Mine : MonoBehaviour
     {
         if (other.CompareTag("Player") && _activeRoutine == null)
         {
-            Debug.Log("Should explode");
             _activeRoutine = StartCoroutine(Triggered());
         }
     }

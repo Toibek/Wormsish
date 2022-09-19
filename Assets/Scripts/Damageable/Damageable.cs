@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class Damageable : MonoBehaviour
 {
-    [SerializeField] private int _maxHealth;
-    private int _health;
+    [SerializeField] protected int _maxHealth;
+    protected int _health;
     private void Start()
     {
         _health = _maxHealth;

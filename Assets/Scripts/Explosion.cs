@@ -4,11 +4,19 @@ using UnityEngine;
 
 public class Explosion : MonoBehaviour
 {
-    private void OnTriggerEnter(Collider other)
+    private int _damage = 0;
+    private bool _started = false;
+    public void StartExplosive(int damage)
     {
-        if (other.GetComponent<Damageable>())
+        _damage = damage;
+        _started = true;
+        GetComponent<ParticleSystem>().Play();
+    }
+    private void OnTriggerStay(Collider other)
+    {
+        if (_started && other.GetComponent<Damageable>())
         {
-            other.GetComponent<Damageable>().Damage(100);
+            other.GetComponent<Damageable>().Damage(_damage);
         }
     }
 }

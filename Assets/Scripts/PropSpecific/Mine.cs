@@ -5,10 +5,16 @@ using UnityEngine;
 public class Mine : MonoBehaviour
 {
     [SerializeField] private int _delay;
+    [SerializeField] private int _damage;
     [SerializeField] private GameObject _explosionPrefab;
     [SerializeField] private float _jumpForce;
     [SerializeField] private bool _testTrigger;
     private Coroutine _activeRoutine;
+    private Rigidbody _rb;
+    private void Start()
+    {
+        _rb = GetComponent<Rigidbody>();
+    }
     private void Update()
     {
         if (_testTrigger)
@@ -28,11 +34,11 @@ public class Mine : MonoBehaviour
     {
         for (int i = 0; i < _delay; i++)
         {
-            GetComponent<Rigidbody>().AddForce(new(0, _jumpForce, 0));
+            _rb.AddForce(new(0, _jumpForce, 0));
             yield return new WaitForSeconds(1);
-            //beepnoise
         }
-        Instantiate(_explosionPrefab, transform.position, Quaternion.identity);
+        GameObject go = Instantiate(_explosionPrefab, transform.position, Quaternion.identity);
+        go.GetComponent<Explosion>().StartExplosive(_damage);
         Destroy(gameObject);
 
     }

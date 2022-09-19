@@ -272,8 +272,10 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8547682345675065915}
-  - component: {fileID: 8547682345675065913}
+  - component: {fileID: 6899493128056069916}
   - component: {fileID: 8547682345675065910}
+  - component: {fileID: 385977198544063531}
+  - component: {fileID: 8547682345675065913}
   - component: {fileID: 8547682345675065911}
   m_Layer: 0
   m_Name: Unit
@@ -300,6 +302,49 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &6899493128056069916
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8547682345675065914}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a5ab0b794d17ad14cbfd87d53c280d96, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &8547682345675065910
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8547682345675065914}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dca4e88713a0b56428d1e1f0986110ab, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _layerMask:
+    serializedVersion: 2
+    m_Bits: 2147483647
+  _jumpHeight: 1
+  _liftHeight: 2
+  _moveTime: 0.5
+--- !u!114 &385977198544063531
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8547682345675065914}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0ca0e8f9c8c8f9947965c50d6a68c7f4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _maxHealth: 100
 --- !u!54 &8547682345675065913
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -316,25 +361,6 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 122
   m_CollisionDetection: 0
---- !u!114 &8547682345675065910
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8547682345675065914}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: dca4e88713a0b56428d1e1f0986110ab, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  CamTransform: {fileID: 0}
-  _layerMask:
-    serializedVersion: 2
-    m_Bits: 2147483647
-  _jumpHeight: 1
-  _liftHeight: 2
-  _moveTime: 0.5
 --- !u!135 &8547682345675065911
 SphereCollider:
   m_ObjectHideFlags: 0

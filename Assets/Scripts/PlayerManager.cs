@@ -6,154 +6,131 @@ using Cinemachine;
 
 public class PlayerManager : MonoBehaviour
 {
-    public int Teams;
+    public List<Team> Teams;
     public int TeamSize;
     public int Moves;
     public int Specials;
     [Space]
     [SerializeField] private GameObject _unitPrefab;
+    [SerializeField] private Material _unitMaterial;
     [SerializeField] private ObjectGen _objectGen;
-    [SerializeField] private CinemachineVirtualCamera _orbitCam;
     [SerializeField] private CinemachineVirtualCamera _followCam;
+    [SerializeField] private CinemachineOrbitalTransposer _followOrbital;
     [Space]
     [SerializeField] private Transform _movesHolder;
     [SerializeField] private Transform _specialsHolder;
 
-    private Movement _activeUnit;
-    private Movement[,] _units;
+    private Unit _activeUnit;
     private Vector2Int _activePlace;
 
     private int _currentMoves;
     private int _currentSpecials;
 
-    private Coroutine _continousMoveRoutine;
-    private Vector2 moveDirection;
-    private bool _cameraActive;
+    private InputHandler _inputHandler;
     private void Start()
     {
-        _orbitCam.Priority = 1;
-        _followCam.Priority = 0;
+        _followOrbital = _followCam.GetCinemachineComponent<CinemachineOrbitalTransposer>();
+        _inputHandler = GetComponent<InputHandler>();
     }
-    public void Move(InputAction.CallbackContext context)
+    private void MoveUnit(Vector2 moveDirection)
     {
-        if (context.started)
+        if (_currentMoves > 0 && _activeUnit.Movement.Move(moveDirection))
         {
-            if (_continousMoveRoutine == null)
-                _continousMoveRoutine = StartCoroutine(ContinousMoving());
-            moveDirection = (Vector2)context.ReadValueAsObject();
-        }
-        else if (context.canceled)
-        {
-            StopCoroutine(_continousMoveRoutine);
-            _continousMoveRoutine = null;
-        }
-    }
-    IEnumerator ContinousMoving()
-    {
-        while (true)
-        {
-            yield return new WaitForEndOfFrame();
-            if (_currentMoves > 0 && _activeUnit.Move(moveDirection))
+            if (--_currentMoves == 0 && _currentSpecials == 0)
             {
-                if (--_currentMoves == 0 && _currentSpecials == 0)
-                {
-                    Invoke(nameof(ChangeUnit), 1);
-                    StopCoroutine(_continousMoveRoutine);
-                }
-                for (int i = 0; i < _specialsHolder.childCount; i++)
-                {
-                    _specialsHolder.GetChild(i).GetChild(0).gameObject.SetActive(i < _currentSpecials);
-                }
-                for (int i = 0; i < _movesHolder.childCount; i++)
-                {
-                    _movesHolder.GetChild(i).GetChild(0).gameObject.SetActive(i < _currentMoves);
-                }
+                Invoke(nameof(ChangeUnit), 1);
             }
-        }
-    }
-    public void Look(InputAction.CallbackContext context)
-    {
-        if(context.performed && _cameraActive)
-            _activeUnit.Rotation();
-    }
-    public void Primary(InputAction.CallbackContext context)
-    {
 
-    }
-    public void Secondary(InputAction.CallbackContext context)
-    {
-        if (context.started)
-        {
-            _followCam.GetComponent<CinemachineInputProvider>().enabled = true;
-            _cameraActive = true;
-        }
-        if (context.canceled)
-        {
-            _followCam.GetComponent<CinemachineInputProvider>().enabled = false;
-            _cameraActive = false;
+            UpdateUiChildren(_specialsHolder, _currentSpecials, 0);
+            UpdateUiChildren(_movesHolder, _currentMoves, 0);
         }
     }
-    public void SwitchWeapon(InputAction.CallbackContext context)
+    public void Rotation(Vector2 rotation)
     {
-
+        _followOrbital.m_XAxis.Value = rotation.x * 0.2f;
+        _activeUnit.Movement.Rotation();
     }
-    public void PassTurn(InputAction.CallbackContext context)
+    private void ToggleOverview()
     {
-        if (context.started)
-            ChangeUnit();
+        _followCam.Priority *= -1;
     }
     public void ChangeUnit()
     {
         _activeUnit.transform.GetChild(1).gameObject.SetActive(false);
-        if (_activePlace.y + 1 >= TeamSize)
+        if (_activePlace.y + 1 >= Teams[_activePlace.x].Units.Count)
         {
-            if (_activePlace.x + 1 >= Teams)
-                _activePlace = new(0, 0);
-            else
-                _activePlace = new(_activePlace.x + 1, 0);
+            int avaliableTeam = -1;
+            if (Teams.Count > _activePlace.x)
+                for (int i = _activePlace.x + 1; i < Teams.Count; i++)
+                {
+                    if (Teams[i].Active)
+                    {
+                        avaliableTeam = i;
+                        break;
+                    }
+                }
+            if (avaliableTeam == -1)
+                for (int i = 0; i < _activePlace.x; i++)
+                {
+                    if (Teams[i].Active)
+                    {
+                        avaliableTeam = i;
+                        break;
+                    }
+                }
+            if (avaliableTeam != -1)
+                _activePlace = new(avaliableTeam, 0);
+            else _activePlace = new(_activePlace.x, 0);
         }
         else
             _activePlace += new Vector2Int(0, 1);
-        _activeUnit = _units[_activePlace.x, _activePlace.y];
+        SetActivePlayer(_activePlace);
+
+        UpdateUiChildren(_specialsHolder, _currentSpecials, 0);
+        UpdateUiChildren(_movesHolder, _currentMoves, 0);
+    }
+    private void UpdateUiChildren(Transform uiToReset, int amountToEnable, int childToEnable)
+    {
+        for (int i = 0; i < uiToReset.childCount; i++)
+            uiToReset.GetChild(i).GetChild(childToEnable).gameObject.SetActive(i < amountToEnable);
+    }
+    void SetActivePlayer(Vector2Int player)
+    {
+        _activeUnit = Teams[player.x].Units[player.y];
+        _activePlace = new(player.x, player.y);
         _activeUnit.transform.GetChild(1).gameObject.SetActive(true);
         _followCam.LookAt = _activeUnit.transform;
         _followCam.Follow = _activeUnit.transform;
-        _activeUnit.CamTransform = _followCam.transform;
+        _activeUnit.Movement.CamTransform = _followCam.transform;
         _currentMoves = Moves;
         _currentSpecials = Specials;
-
-        for (int i = 0; i < _specialsHolder.childCount; i++)
-        {
-            _specialsHolder.GetChild(i).GetChild(0).gameObject.SetActive(i < _currentSpecials);
-        }
-        for (int i = 0; i < _movesHolder.childCount; i++)
-        {
-            _movesHolder.GetChild(i).GetChild(0).gameObject.SetActive(i < _currentMoves);
-        }
     }
     public IEnumerator SpawnPlayers()
     {
         List<GameObject> spawnPoints = new List<GameObject>();
         spawnPoints.AddRange(GameObject.FindGameObjectsWithTag("Respawn"));
-        int n = Teams * TeamSize;
+        int n = Teams.Count * TeamSize;
         if (spawnPoints.Count < n)
         {
             Debug.Log("Asking for more respawn points");
             spawnPoints.AddRange(_objectGen.More("Spawner", n - spawnPoints.Count));
         }
 
-
-        _units = new Movement[Teams, TeamSize];
-        for (int team = 0; team < Teams; team++)
+        for (int team = 0; team < Teams.Count; team++)
         {
+            Teams[team].Active = true;
+            Material mat = new(_unitMaterial);
+            mat.color = Teams[team].color;
             for (int unit = 0; unit < TeamSize; unit++)
             {
                 int r = Random.Range(0, spawnPoints.Count);
-                GameObject go = Instantiate(_unitPrefab, spawnPoints[r].transform.position, Quaternion.identity);
+                GameObject go = Instantiate(_unitPrefab, spawnPoints[r].transform.position, Quaternion.identity, transform);
+                go.GetComponentInChildren<MeshRenderer>().material = mat;
                 Destroy(spawnPoints[r]);
                 spawnPoints.RemoveAt(r);
-
-                _units[team, unit] = go.GetComponent<Movement>();
+                Unit u = go.GetComponent<Unit>();
+                u.PlayerManager = this;
+                Teams[team].Units.Add(u);
                 yield return new WaitForEndOfFrame();
             }
         }
@@ -162,34 +139,69 @@ public class PlayerManager : MonoBehaviour
             Destroy(spawnPoints[i]);
             spawnPoints.RemoveAt(i);
         }
-        _activeUnit = _units[0, 0];
-        _activePlace = new(0, 0);
-        _activeUnit.transform.GetChild(1).gameObject.SetActive(true);
-        _followCam.LookAt = _activeUnit.transform;
-        _followCam.Follow = _activeUnit.transform;
-        _followCam.m_Priority = 1;
-        _orbitCam.Priority = 0;
-        _activeUnit.CamTransform = _followCam.transform;
-        _currentMoves = Moves;
-        _currentSpecials = Specials;
+        SetActivePlayer(new(0, 0));
 
+        _inputHandler.OnMovementStay = MoveUnit;
+        _inputHandler.OnRotationStay = Rotation;
+        _inputHandler.OnPassTurn = ChangeUnit;
+        _inputHandler.OnShowMap = ToggleOverview;
 
-        GameObject UiRef = _specialsHolder.GetChild(0).gameObject;
-        for (int i = 1; i < Specials; i++)
-            Instantiate(UiRef, _specialsHolder);
-        for (int i = 0; i < _specialsHolder.childCount; i++)
-        {
-            _specialsHolder.GetChild(i).GetChild(0).gameObject.SetActive(i < _currentSpecials);
-        }
+        DuplicateFirstChild(_specialsHolder, Specials);
         _specialsHolder.gameObject.SetActive(true);
 
-        UiRef = _movesHolder.GetChild(0).gameObject;
-        for (int i = 1; i < Moves; i++)
-            Instantiate(UiRef, _movesHolder);
-        for (int i = 0; i < _movesHolder.childCount; i++)
-        {
-            _movesHolder.GetChild(i).GetChild(0).gameObject.SetActive(i < _currentMoves);
-        }
+        DuplicateFirstChild(_movesHolder, Moves);
         _movesHolder.gameObject.SetActive(true);
+
+        _followCam.m_Priority = 1;
     }
+    private void DuplicateFirstChild(Transform content, int amount)
+    {
+        GameObject uiRef = content.GetChild(0).gameObject;
+        for (int i = 1; i < amount; i++)
+            Instantiate(uiRef, content);
+    }
+    public void ReportUnitDeath(Unit unit)
+    {
+        if (_activeUnit == unit)
+            ChangeUnit();
+        for (int i = 0; i < Teams.Count; i++)
+        {
+            if (Teams[i].Units.Contains(unit))
+            {
+                Teams[i].Units.Remove(unit);
+                if (Teams[i].Units.Count <= 0)
+                {
+                    Teams[i].Active = false;
+                    Team t = CheckForWinner();
+                    if (t != null) DeclareWinner(t);
+
+                }
+                break;
+            }
+        }
+    }
+    private Team CheckForWinner()
+    {
+        int winner = -1;
+        for (int i = 0; i < Teams.Count; i++)
+        {
+            if (winner == -1 && Teams[i].Active)
+                winner = i;
+            else if (Teams[i].Active)
+                return null;
+        }
+        return Teams[winner];
+    }
+    private void DeclareWinner(Team team)
+    {
+        Debug.Log(team.Name + " is the winner!");
+    }
+}
+[System.Serializable]
+public class Team : object
+{
+    public bool Active;
+    public string Name;
+    public Color color;
+    public List<Unit> Units;
 }

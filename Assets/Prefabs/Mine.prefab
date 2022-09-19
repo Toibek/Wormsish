@@ -92,6 +92,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _delay: 3
+  _damage: 150
   _explosionPrefab: {fileID: 1874454068450570211, guid: 275ca2683e946dc42a34e95cecbefb75, type: 3}
   _jumpForce: 200
   _testTrigger: 0

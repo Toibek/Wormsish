@@ -48,7 +48,6 @@ public class IslandGen : MonoBehaviour
     /// <summary>
     /// A coroutine to create the base level, allowing for breaks in the creation.
     /// </summary>
-    /// <returns></returns>
     public IEnumerator GenerationRoutine()
     {
         //Stop preloading if it's active
@@ -90,7 +89,7 @@ public class IslandGen : MonoBehaviour
             }
         }
         yield return new WaitForEndOfFrame();
-        PlaceableArea = maps[maps.Count - 1];
+        PlaceableArea = maps[^1];
     }
     /// <summary>
     /// Returning a cube, Making sure to instantiate if there's no avaliable inactive cubes

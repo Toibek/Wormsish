@@ -33,7 +33,16 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "SwitchWeapon",
+                    "name": "Secondary",
+                    "type": "Button",
+                    "id": "0d931f5c-89d5-4015-9275-22d4c7e506c5",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "ToggleMap",
                     "type": "Button",
                     "id": "f9542b71-d658-4c5a-a935-d2dfb580c29e",
                     "expectedControlType": "Button",
@@ -45,15 +54,6 @@
                     "name": "PassTurn",
                     "type": "Button",
                     "id": "0b4cbbfd-8093-457a-af7e-180eb696d1cb",
-                    "expectedControlType": "Button",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": false
-                },
-                {
-                    "name": "Secondary",
-                    "type": "Button",
-                    "id": "0d931f5c-89d5-4015-9275-22d4c7e506c5",
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": "",
@@ -284,11 +284,11 @@
                 {
                     "name": "",
                     "id": "1c1d5b41-9094-4f9b-a187-8b39aded18af",
-                    "path": "<Keyboard>/q",
+                    "path": "<Keyboard>/m",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "SwitchWeapon",
+                    "action": "ToggleMap",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },

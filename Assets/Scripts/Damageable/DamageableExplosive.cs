@@ -5,9 +5,11 @@ using UnityEngine;
 public class DamageableExplosive : Damageable
 {
     [SerializeField] private GameObject _prefabExplosion;
+    [SerializeField] private int _damage;
     public override void LethalDamage()
     {
-        Instantiate(_prefabExplosion, transform.position, Quaternion.identity);
+        GameObject go = Instantiate(_prefabExplosion, transform.position, Quaternion.identity);
+        go.GetComponent<Explosion>().StartExplosive(_damage);
         base.LethalDamage();
     }
 }

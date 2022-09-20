@@ -62,7 +62,7 @@ public class IslandGen : MonoBehaviour
         yield return new WaitForEndOfFrame();
         //Get the base maps from the Cellular automata generator
         List<bool[,]> maps = new List<bool[,]>();
-        maps.Add(Cellular.GenerateArray(Size, NoiseDensity, Neighbors, Iterations));
+        maps.Add(Cellular.GenerateArray(-1,Size, NoiseDensity, Neighbors, Iterations));
         for (int i = 0; i < Layers; i++)
         {
             maps.Add(Cellular.Iterate(maps[maps.Count - 1]));

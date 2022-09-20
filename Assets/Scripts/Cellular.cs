@@ -2,6 +2,7 @@ using UnityEngine;
 
 public static class Cellular
 {
+    public static int Seed = -1;
     static int lastNeighbors = 6;
     /// <summary>
     /// Generate a bool array with cellular automata
@@ -11,9 +12,13 @@ public static class Cellular
     /// <param name="neighbors">neighbors required to remain true through the itterations</param>
     /// <param name="iterations">amount of itteration before it returns</param>
     /// <returns>a finished generated noise array</returns>
-    static public bool[,] GenerateArray(int size = 50, int noise = 88, int neighbors = 6, int iterations = 10)
+    static public bool[,] GenerateArray(int seed = -1,  int size = 50, int noise = 88, int neighbors = 6, int iterations = 10)
     {
-        bool[,] pixels = Create(new(size + 25, size + 25), noise);
+        if (seed == -1)
+            seed = Random.Range(-99999, 99999);
+        Seed = seed;
+
+        bool[,] pixels = Create(seed,new(size + 25, size + 25), noise);
         for (int i = 0; i < iterations; i++)
             pixels = Iterate(pixels, neighbors);
         return pixels;
@@ -26,9 +31,9 @@ public static class Cellular
     /// <param name="neighbors">neighbors required to remain true through the itterations</param>
     /// <param name="iterations">amount of itteration before it returns</param>
     /// <returns>a finished generated noise texture </returns>
-    static public Texture2D GenerateTexture(int size = 50, int noise = 88, int neighbors = 6, int iterations = 10)
+    static public Texture2D GenerateTexture(int seed = -1,int size = 50, int noise = 88, int neighbors = 6, int iterations = 10)
     {
-        bool[,] pixels = GenerateArray(size, noise, neighbors, iterations);
+        bool[,] pixels = GenerateArray(seed, size, noise, neighbors, iterations);
         return Texturize(pixels);
     }
     /// <summary>
@@ -37,14 +42,16 @@ public static class Cellular
     /// <param name="size">the size of the array</param>
     /// <param name="density">the noise density</param>
     /// <returns></returns>
-    static bool[,] Create(Vector2Int size, int density)
+    static bool[,] Create(int seed, Vector2Int size, int density)
     {
         bool[,] pixels = new bool[size.x, size.y];
+        Random.InitState(seed);
         for (int x = 0; x < pixels.GetLength(0); x++)
         {
             for (int y = 0; y < pixels.GetLength(1); y++)
             {
                 float dis = Vector2Int.Distance(new Vector2Int(x, y), new Vector2Int(size.x / 2, size.y / 2)) / (size.x * 0.01f);
+                
                 pixels[x, y] = Random.Range(0, 100) < density - dis;
             }
         }

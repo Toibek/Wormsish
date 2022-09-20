@@ -4,39 +4,40 @@ using UnityEngine;
 
 public class Movement : MonoBehaviour
 {
+    internal Unit Unit;
     internal Transform CamTransform;
-    internal PlayerManager PlayerManager;
-    internal Team Team;
 
     [SerializeField] LayerMask _layerMask;
     [SerializeField] int _jumpHeight;
     [SerializeField] float _liftHeight;
     [SerializeField] float _moveTime;
-    Vector3 _startPosition = Vector3.zero;
-    Vector3 _endPosition = Vector3.forward;
-    Coroutine _moveRoutine;
-    internal Unit Unit;
 
+    Coroutine _moveRoutine;
+
+    /// <summary>
+    /// Check if movement is avaliable and return wether or not it could start, start MoveIE if as long as the moveroutine is not started
+    /// </summary>
+    /// <param name="direction">Direction of movement</param>
+    /// <returns></returns>
     public bool Move(Vector2 direction)
     {
         bool ret = false;
-
-        Vector3 movement = Vector3.zero;
-        Vector3 camForward = CamTransform.forward;
-        camForward.y = 0;
-        movement += camForward * direction.y;
-
-        Vector3 camRight = CamTransform.right;
-        camRight.y = 0;
-        movement += camRight * direction.x;
-        movement.Normalize();
-        movement.x = Mathf.Round(movement.x);
-        movement.z = Mathf.Round(movement.z);
-
         if (_moveRoutine == null)
         {
-            _startPosition = transform.position;
-            _endPosition = transform.position;
+            Vector3 movement = Vector3.zero;
+            Vector3 forward = transform.forward;
+            forward.y = 0;
+            movement += forward * direction.y;
+
+            Vector3 right = transform.right;
+            right.y = 0;
+            movement += right * direction.x;
+            movement.Normalize();
+
+            movement.x = Mathf.Round(movement.x);
+            movement.z = Mathf.Round(movement.z);
+
+            Vector3 endPosition = transform.position;
             Ray heightCheckRay = new(transform.position + new Vector3(0, _jumpHeight, 0), movement);
             if (!Physics.Raycast(heightCheckRay, 1f, _layerMask))
             {
@@ -44,14 +45,17 @@ public class Movement : MonoBehaviour
                 Debug.DrawRay(positioningRay.origin, positioningRay.direction + new Vector3(0, -1, 0) * 20);
                 if (Physics.Raycast(positioningRay, out RaycastHit hit, 20, _layerMask, queryTriggerInteraction: QueryTriggerInteraction.Ignore))
                 {
-                    _endPosition = hit.point + new Vector3(0, .5f, 0);
+                    endPosition = hit.point + new Vector3(0, .5f, 0);
                     ret = true;
                 }
             }
-            _moveRoutine = StartCoroutine(MoveIE());
+            _moveRoutine = StartCoroutine(MoveIE(transform.position, endPosition));
         }
         return ret;
     }
+    /// <summary>
+    /// Update the rotation of the unit relative to the camera
+    /// </summary>
     public void Rotation()
     {
         Vector3 dif = (transform.position - CamTransform.position).normalized;
@@ -59,32 +63,26 @@ public class Movement : MonoBehaviour
         rot = Mathf.Round(rot / 45) * 45;
         transform.rotation = Quaternion.Euler(0, rot, 0);
     }
-    IEnumerator MoveIE()
+    /// <summary>
+    /// run movement between start and end position through a brazier curve
+    /// </summary>
+    /// <param name="startPosition">the origin of the object</param>
+    /// <param name="endPosition">the final position</param>
+    IEnumerator MoveIE(Vector3 startPosition, Vector3 endPosition)
     {
+        float maxHeight = Mathf.Max(startPosition.y, endPosition.y);
         for (float f = 0; f < _moveTime; f += Time.deltaTime)
         {
             Vector3 pos =
-                Mathf.Pow(1 - (f / _moveTime), 2) * _startPosition +
-                2 * Mathf.Pow(1 - (f / _moveTime), 2) * (f / _moveTime) * (_startPosition + new Vector3(0, _liftHeight)) +
-                2 * (1 - (f / _moveTime)) * Mathf.Pow((f / _moveTime), 2) * (_endPosition + new Vector3(0, _liftHeight)) +
-                Mathf.Pow((f / _moveTime), 2) * _endPosition;
+                Mathf.Pow(1 - (f / _moveTime), 2) * startPosition +
+                2 * Mathf.Pow(1 - (f / _moveTime), 2) * (f / _moveTime) * (new Vector3(startPosition.x, maxHeight + _liftHeight, startPosition.z)) +
+                2 * (1 - (f / _moveTime)) * Mathf.Pow((f / _moveTime), 2) * (new Vector3(endPosition.x, maxHeight + _liftHeight, endPosition.z)) +
+                Mathf.Pow((f / _moveTime), 2) * endPosition;
 
             transform.position = pos;
             yield return new WaitForFixedUpdate();
         }
-        transform.position = _endPosition;
+        transform.position = endPosition;
         _moveRoutine = null;
-    }
-    private void OnDrawGizmosSelected()
-    {
-        for (float f = 0; f < 1; f += 0.05f)
-        {
-            Vector3 pos =
-                Mathf.Pow(1 - f, 2) * _startPosition +
-                2 * Mathf.Pow(1 - f, 2) * f * (_startPosition + new Vector3(0, _liftHeight)) +
-                2 * (1 - f) * Mathf.Pow(f, 2) * (_endPosition + new Vector3(0, _liftHeight)) +
-                Mathf.Pow(f, 2) * _endPosition;
-            Gizmos.DrawSphere(pos, 0.25f);
-        }
     }
 }

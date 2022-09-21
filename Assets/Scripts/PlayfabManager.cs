@@ -4,124 +4,250 @@ using UnityEngine;
 using PlayFab;
 using PlayFab.MultiplayerModels;
 using PlayFab.ClientModels;
+using PlayFab.Party;
 using TMPro;
+using UnityEngine.UI;
 public class PlayfabManager : MonoBehaviour
 {
-    public string ConnectionString;
+    public string PartyString;
+    public string DisplayName;
+    public string EnteredName;
     PlayFabAuthenticationContext _authCont;
-    EntityTokenResponse _key;
-    [SerializeField] string OwnedLobbyId;
-    [SerializeField] Dictionary<string, string> _memberData;
-    [Space]
-    [SerializeField] Transform LogContent;
-    [SerializeField] GameObject LogText;
-    [Space]
-    [SerializeField] TMP_InputField CreateOutput;
-    [Space]
-    [SerializeField] TMP_InputField JoinInput;
+    List<FriendInfo> _friends;
 
-
-    // Start is called before the first frame update
-    void Start()
+    private void OnApplicationQuit()
     {
-        var request = new LoginWithCustomIDRequest { CustomId = SystemInfo.deviceUniqueIdentifier, CreateAccount = true };
-        PlayFabClientAPI.LoginWithCustomID(request, OnLoginSuccess, OnPlayfabError);
+
+        if (PlayFabMultiplayerManager.Get().State == PlayFabMultiplayerManagerState.ConnectedToNetwork)
+            LeaveParty();
+        RemovePersonalData("activeGame");
     }
-
-    private void OnDestroy()
+    #region ClientStuff
+    public void Login(string nameEntered)
     {
-        if (!string.IsNullOrEmpty(OwnedLobbyId))
+        EnteredName = nameEntered;
+        var request = new LoginWithCustomIDRequest
         {
-            DestroyLobby();
-        }
-    }
-    PlayFab.MultiplayerModels.EntityKey MyKey()
-    {
-        return new PlayFab.MultiplayerModels.EntityKey
-        {
-            Id = _authCont.EntityId,
-            Type = _authCont.EntityType
+            CustomId = SystemInfo.deviceUniqueIdentifier,
+            CreateAccount = true
         };
-    }
-    public void WriteLog(string log)
-    {
-        GameObject go = Instantiate(LogText, LogContent);
-        go.GetComponent<TMP_Text>().text = log;
+        PlayFabClientAPI.LoginWithCustomID(request, OnLoginSuccess, OnPlayfabError);
     }
     void OnLoginSuccess(LoginResult result)
     {
         _authCont = result.AuthenticationContext;
-        WriteLog("Logged in: " + result.PlayFabId);
+        Debug.Log("Logged in: " + result.PlayFabId);
+        GetName();
+        PlayFabMultiplayerManager.Get().OnError += OnPartyError;
     }
-    public void QueueForMatch()
+    void GetName()
     {
-
-    }
-    public void CreateLobby()
-    {
-        var request = new CreateLobbyRequest { };
-        request.Owner = MyKey();
-        request.AccessPolicy = AccessPolicy.Public;
-        request.MaxPlayers = 4;
-        request.Members = new List<Member>();
-
-        Member m = new();
-        m.MemberEntity = MyKey();
-        m.MemberData = _memberData;
-        request.Members.Add(m);
-
-        PlayFabMultiplayerAPI.CreateLobby(request, OnLobbyCreated, OnPlayfabError);
-    }
-    public void JoinLobby() { JoinLobby(JoinInput.text); }
-    void JoinLobby(string connectionString)
-    {
-        var request = new JoinLobbyRequest { };
-        request.ConnectionString = connectionString;
-        request.AuthenticationContext = _authCont;
-        request.MemberEntity = MyKey();
-        request.MemberData = _memberData;
-        PlayFabMultiplayerAPI.JoinLobby(request, OnLobbyJoined, OnPlayfabError);
-    }
-    public void FindLobbies()
-    {
-        var request = new FindLobbiesRequest();
-        request.AuthenticationContext = _authCont;
-        PlayFabMultiplayerAPI.FindLobbies(request, OnLobbiesFound, OnPlayfabError);
-    }
-    public void DestroyLobby()
-    {
-        var request = new DeleteLobbyRequest { };
-        request.AuthenticationContext = _authCont;
-        request.LobbyId = OwnedLobbyId;
-        PlayFabMultiplayerAPI.DeleteLobby(request, OnLobbyDeleted, OnPlayfabError);
-    }
-    void OnLobbyCreated(CreateLobbyResult result)
-    {
-        OwnedLobbyId = result.LobbyId;
-        ConnectionString = result.ConnectionString;
-        if (CreateOutput != null)
-            CreateOutput.text = result.ConnectionString;
-        WriteLog("Lobby Created: " + result.LobbyId);
-    }
-    void OnLobbyJoined(JoinLobbyResult result)
-    {
-        WriteLog("Lobby Joined: " + result.LobbyId);
-    }
-    void OnLobbiesFound(FindLobbiesResult result)
-    {
-        for (int i = 0; i < result.Lobbies.Count; i++)
+        var request = new GetAccountInfoRequest()
         {
-            WriteLog(result.Lobbies[i].ConnectionString);
+            AuthenticationContext = _authCont
+        };
+        PlayFabClientAPI.GetAccountInfo(request, OnRetrievedName, OnPlayfabError);
+    }
+    void OnRetrievedName(GetAccountInfoResult result)
+    {
+        DisplayName = result.AccountInfo.TitleInfo.DisplayName;
+        if (string.IsNullOrEmpty(EnteredName) && DisplayName != EnteredName) ChangeName(name);
+        Debug.Log("Got Name: " + DisplayName);
+    }
+
+    public void ChangeName(string name)
+    {
+        var request = new UpdateUserTitleDisplayNameRequest
+        {
+            DisplayName = name,
+            AuthenticationContext = _authCont
+        };
+        PlayFabClientAPI.UpdateUserTitleDisplayName(request, OnChangeName, OnPlayfabError);
+    }
+    void OnChangeName(UpdateUserTitleDisplayNameResult result)
+    {
+        Debug.Log("Name changed to: " + result.DisplayName);
+    }
+
+    public void AddFriend(string name)
+    {
+        var request = new AddFriendRequest();
+        request.AuthenticationContext = _authCont;
+        request.FriendTitleDisplayName = name;
+        PlayFabClientAPI.AddFriend(request, OnFriendAdded, OnPlayfabError);
+    }
+    void OnFriendAdded(AddFriendResult result)
+    {
+        if (result.Created)
+            Debug.Log("Friend added");
+    }
+
+    public void GetFriendsList()
+    {
+        var request = new GetFriendsListRequest
+        {
+            AuthenticationContext = _authCont,
+            ProfileConstraints = new PlayerProfileViewConstraints()
+            {
+                ShowDisplayName = true,
+                ShowLastLogin = true
+            }
+        };
+        PlayFabClientAPI.GetFriendsList(request, OnRetrievedFriendsList, OnPlayfabError);
+    }
+    void OnRetrievedFriendsList(GetFriendsListResult result)
+    {
+        _friends = result.Friends;
+        for (int i = 0; i < _friends.Count; i++)
+        {
+            Debug.Log(_friends[i].TitleDisplayName + _friends[i].Profile.LastLogin);
         }
     }
-    void OnLobbyDeleted(LobbyEmptyResult result)
+
+    public void SetPersonalData(string key, string value)
     {
-        WriteLog("Lobby deleted");
+        var request = new UpdateUserDataRequest
+        {
+            AuthenticationContext = _authCont,
+            Data = new Dictionary<string, string> { { key, value } },
+            Permission = UserDataPermission.Public
+        };
+        PlayFabClientAPI.UpdateUserData(request, DataSet, OnPlayfabError);
     }
+    public void RemovePersonalData(string key)
+    {
+        var request = new UpdateUserDataRequest
+        {
+            AuthenticationContext = _authCont,
+            KeysToRemove = new List<string> { key }
+        };
+        PlayFabClientAPI.UpdateUserData(request, DataSet, OnPlayfabError);
+    }
+    void DataSet(UpdateUserDataResult result)
+    {
+        Debug.Log("Data Updated");
+    }
+    public void GetUserData(string name, string data)
+    {
+        for (int i = 0; i < _friends.Count; i++)
+        {
+            if (_friends[i].TitleDisplayName == name)
+            {
+                var request = new GetUserDataRequest
+                {
+                    AuthenticationContext = _authCont,
+                    PlayFabId = _friends[i].FriendPlayFabId,
+                    Keys = new List<string>() { data }
+                };
+                PlayFabClientAPI.GetUserData(request, RetrievedUserData, OnPlayfabError);
+            }
+        }
+    }
+    void RetrievedUserData(GetUserDataResult result)
+    {
+        if (result.Data.ContainsKey("activeGame") && !string.IsNullOrEmpty(result.Data["activeGame"].Value))
+        {
+            JoinParty(result.Data["activeGame"].Value);
+        }
+        else
+            Debug.Log("Friend is not currently in a game");
+    }
+
     void OnPlayfabError(PlayFabError error)
     {
-        WriteLog("Playfab error");
+        Debug.Log("Playfab error: " + error.ErrorMessage);
         Debug.LogWarning(error);
     }
+    #endregion
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    #region Party System
+    public void CreateParty()
+    {
+        PlayFabMultiplayerManager.Get().CreateAndJoinNetwork();
+        PlayFabMultiplayerManager.Get().OnNetworkJoined += OnPartyJoined;
+    }
+    public void JoinParty(string netId)
+    {
+        PlayFabMultiplayerManager.Get().JoinNetwork(netId);
+        PlayFabMultiplayerManager.Get().OnNetworkJoined += OnPartyJoined;
+    }
+    public void LeaveParty()
+    {
+        PlayFabMultiplayerManager.Get().LeaveNetwork();
+        PlayFabMultiplayerManager.Get().OnNetworkLeft += OnPartyLeft;
+    }
+    private void OnPartyJoined(object sender, string networkId)
+    {
+        Debug.Log("Party joined");
+        PlayFabMultiplayerManager.Get().OnRemotePlayerJoined += OnRemotePlayerJoined;
+        PlayFabMultiplayerManager.Get().OnChatMessageReceived += OnChatMessageReceived;
+        PlayFabMultiplayerManager.Get().OnDataMessageReceived += OnDataMessageReceived;
+        PlayFabMultiplayerManager.Get().OnRemotePlayerLeft += OnRemotePlayerLeft;
+
+        SetPersonalData("activeGame", networkId);
+    }
+
+    public void SendChatMessage(string message)
+    {
+        if (!string.IsNullOrEmpty(message))
+        {
+            Debug.Log(_authCont.EntityId + " : " + message);
+            PlayFabMultiplayerManager.Get().SendChatMessageToAllPlayers(message);
+        }
+    }
+    public void SendDataMessage(byte[] buffer)
+    {
+        PlayFabMultiplayerManager.Get().SendDataMessageToAllPlayers(buffer);
+    }
+    private void OnRemotePlayerLeft(object sender, PlayFabPlayer player)
+    {
+        Debug.Log(player._entityToken + " Has left the party");
+    }
+
+    private void OnChatMessageReceived(object sender, PlayFabPlayer from, string message, ChatMessageType type)
+    {
+        Debug.Log(from._entityToken + " : " + message);
+    }
+
+    private void OnRemotePlayerJoined(object sender, PlayFabPlayer player)
+    {
+        Debug.Log(player._entityToken + " Has joined the party");
+    }
+
+    private void OnPartyLeft(object sender, string networkId)
+    {
+        Debug.Log("You have left the party");
+    }
+    private void OnDataMessageReceived(object sender, PlayFabPlayer from, byte[] buffer)
+    {
+        string message = "Datamessage:" + from + ":";
+        for (int i = 0; i < buffer.Length; i++)
+            message += buffer[i];
+        Debug.Log(message);
+    }
+
+
+    private void OnPartyError(object sender, PlayFabMultiplayerManagerErrorArgs args)
+    {
+        Debug.LogError("Party error occured: " + args.Message);
+    }
+    #endregion
+
 
 }

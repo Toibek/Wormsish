@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Text;
 using System.Collections.Generic;
 using UnityEngine;
 using PlayFab;
@@ -183,21 +184,6 @@ public class PlayfabManager : MonoBehaviour
     #endregion
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     #region Party System
     public void CreateParty()
     {
@@ -221,7 +207,6 @@ public class PlayfabManager : MonoBehaviour
         PlayFabMultiplayerManager.Get().OnChatMessageReceived += OnChatMessageReceived;
         PlayFabMultiplayerManager.Get().OnDataMessageReceived += OnDataMessageReceived;
         PlayFabMultiplayerManager.Get().OnRemotePlayerLeft += OnRemotePlayerLeft;
-
         SetPersonalData("activeGame", networkId);
     }
 
@@ -233,38 +218,33 @@ public class PlayfabManager : MonoBehaviour
             PlayFabMultiplayerManager.Get().SendChatMessageToAllPlayers(message);
         }
     }
-    public void SendDataMessage(byte[] buffer)
-    {
-        PlayFabMultiplayerManager.Get().SendDataMessageToAllPlayers(buffer);
-    }
     private void OnRemotePlayerLeft(object sender, PlayFabPlayer player)
     {
         Debug.Log(player._entityToken + " Has left the party");
     }
-
     private void OnChatMessageReceived(object sender, PlayFabPlayer from, string message, ChatMessageType type)
     {
         Debug.Log(from._entityToken + " : " + message);
     }
-
     private void OnRemotePlayerJoined(object sender, PlayFabPlayer player)
     {
         Debug.Log(player._entityToken + " Has joined the party");
     }
-
     private void OnPartyLeft(object sender, string networkId)
     {
         Debug.Log("You have left the party");
     }
+    public void SendDataMessage(string message)
+    {
+        byte[] buffer = Encoding.Default.GetBytes(message);
+        PlayFabMultiplayerManager.Get().SendDataMessageToAllPlayers(buffer);
+    }
     private void OnDataMessageReceived(object sender, PlayFabPlayer from, byte[] buffer)
     {
-        string message = "Datamessage:" + from + ":";
-        for (int i = 0; i < buffer.Length; i++)
-            message += buffer[i];
+        string incoming = Encoding.Default.GetString(buffer);
+        string message = "Data:" + from + ":" + incoming;
         Debug.Log(message);
     }
-
-
     private void OnPartyError(object sender, PlayFabMultiplayerManagerErrorArgs args)
     {
         Debug.LogError("Party error occured: " + args.Message);

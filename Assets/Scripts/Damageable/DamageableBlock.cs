@@ -7,7 +7,7 @@ public class DamageableBlock : Damageable
     public override void LethalDamage()
     {
         //Callback to save the block
-        GetComponentInParent<IslandGen>().RemoveCube(gameObject);
+        GetComponentInParent<IslandManager>().RemoveCube(gameObject);
         base.LethalDamage();
     }
 }

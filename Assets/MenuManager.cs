@@ -27,7 +27,7 @@ public class MenuManager : MonoBehaviour
         if (!string.IsNullOrEmpty(_username))
             loginNameField.text = _username;
     }
-    public void PlayOnline()
+    public void Login()
     {
         HostButton.interactable = true;
         SocialButton.interactable = true;
@@ -42,7 +42,7 @@ public class MenuManager : MonoBehaviour
         _pfManager.OnLoginComplete -= OnLoginComplete;
         MainView.Show();
     }
-    public void PlayOffline()
+    public void Offline()
     {
         HostButton.interactable = false;
         SocialButton.interactable = false;
@@ -65,7 +65,7 @@ public class MenuManager : MonoBehaviour
     public void LoadFriends(string[] friends)
     {
         for (int i = FriendHolder.childCount - 1; i >= 0; i--)
-            Destroy(FriendHolder.GetChild(i));
+            Destroy(FriendHolder.GetChild(i).gameObject);
 
         for (int i = 0; i < friends.Length; i++)
         {
@@ -83,5 +83,9 @@ public class MenuManager : MonoBehaviour
     {
         FriendView.Hide();
         _pfManager.OnFriendsFetched -= LoadFriends;
+    }
+    public void HostGame()
+    {
+        _pfManager.CreateParty();
     }
 }

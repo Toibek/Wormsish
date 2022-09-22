@@ -40,7 +40,7 @@ Material:
     m_Floats:
     - _BUILTIN_QueueControl: 0
     - _BUILTIN_QueueOffset: 0
-    - _Density: 0.1
+    - _Density: 0.01
     - _FadeMult: 0.001
     - _FoamDensity: 100
     - _FoamSpeed: 0.05

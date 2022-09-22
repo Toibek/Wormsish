@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class IslandGen : MonoBehaviour
+public class IslandManager : MonoBehaviour
 {
     /*
      For future reference-
@@ -12,12 +12,12 @@ public class IslandGen : MonoBehaviour
 
     internal bool[,] PlaceableArea;
     [Header("Generation settings")]
-    [SerializeField] private int _cubesToPreload;
-    [SerializeField] private int Size = 50;
+    [SerializeField] private int _cubesToPreload = 5000;
+    [SerializeField] private int Size = 75;
     [SerializeField] private int Layers = 3;
-    [SerializeField] [Range(0, 100)] private int NoiseDensity = 88;
-    [SerializeField] [Range(1, 7)] private int Neighbors = 6;
-    [SerializeField] [Range(0, 20)] private int Iterations = 10;
+    [SerializeField] [Range(0, 100)] private int NoiseDensity = 86;
+    [SerializeField] [Range(1, 7)] private int Neighbors = 5;
+    [SerializeField] [Range(0, 20)] private int Iterations = 6;
     [Header("Cube settings")]
     [SerializeField] GameObject _cubePrefab;
     [SerializeField] Material _topMaterial;
@@ -25,6 +25,9 @@ public class IslandGen : MonoBehaviour
 
     List<GameObject> _inactiveCubes = new List<GameObject>();
     List<GameObject> _activeCubes = new List<GameObject>();
+
+    GameObject[,,] _activeMapObjects;
+    bool[,,] _activeMap;
 
     private Coroutine preLoadRoutine;
     private void Start()
@@ -48,7 +51,7 @@ public class IslandGen : MonoBehaviour
     /// <summary>
     /// A coroutine to create the base level, allowing for breaks in the creation.
     /// </summary>
-    public IEnumerator GenerationRoutine()
+    public IEnumerator GenerationRoutine(int seed = -1, bool[,,] preGenerated = null)
     {
         //Stop preloading if it's active
         if (preLoadRoutine != null)
@@ -60,36 +63,35 @@ public class IslandGen : MonoBehaviour
         for (int i = _activeCubes.Count - 1; i >= 0; i--)
             RemoveCube(_activeCubes[i]);
         yield return new WaitForEndOfFrame();
+
         //Get the base maps from the Cellular automata generator
-        List<bool[,]> maps = new List<bool[,]>();
-        maps.Add(Cellular.GenerateArray(-1,Size, NoiseDensity, Neighbors, Iterations));
-        for (int i = 0; i < Layers; i++)
-        {
-            maps.Add(Cellular.Iterate(maps[maps.Count - 1]));
-            yield return new WaitForEndOfFrame();
-        }
+        //List<bool[,]> maps = new List<bool[,]>();
+        bool[,,] maps = Cellular.GenerateArray(seed, Layers, Size, NoiseDensity, Neighbors, Iterations);
         //Place the cubes in the enabled positions
-        Vector3Int offset = new(-maps[0].GetLength(0) / 2, 0, -maps[0].GetLength(1) / 2);
-        for (int i = 0; i < maps.Count; i++)
+        Vector3Int offset = new(-maps.GetLength(0) / 2, 0, -maps.GetLength(2) / 2);
+        PlaceableArea = new bool[maps.GetLength(0), maps.GetLength(2)];
+        for (int y = 0; y < maps.GetLength(1); y++)
         {
-            for (int x = i; x < maps[i].GetLength(0) - i; x++)
+            for (int x = 0; x < maps.GetLength(0) - y; x++)
             {
-                for (int y = i; y < maps[i].GetLength(1) - i; y++)
+                for (int z = 0; z < maps.GetLength(2) - z; z++)
                 {
-                    if (maps[i][x, y])
+                    if (maps[x, y, z])
                     {
-                        GameObject go = GetCube(new Vector3(x, i, y) + offset);
-                        if (i < maps.Count - 1 && maps[i + 1][x, y])
+                        GameObject go = GetCube(new Vector3(x, z, z) + offset);
+                        if (y < maps.GetLength(1) - 1 && maps[x, y + 1, z])
                             go.GetComponent<MeshRenderer>().material = _botMaterial;
                         else
+                        {
                             go.GetComponent<MeshRenderer>().material = _topMaterial;
+                            PlaceableArea[x, z] = true;
+                        }
                     }
                 }
                 yield return new WaitForEndOfFrame();
             }
         }
         yield return new WaitForEndOfFrame();
-        PlaceableArea = maps[^1];
     }
     /// <summary>
     /// Returning a cube, Making sure to instantiate if there's no avaliable inactive cubes

@@ -4,7 +4,8 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
-    public IslandGen IslandGen;
+    public PlayerState PlayerState = PlayerState.Menu;
+    public IslandManager IslandGen;
     public ObjectGen ObjectGen;
     public PlayerManager PlayerManager;
 
@@ -24,4 +25,6 @@ public class GameManager : MonoBehaviour
         SetupUI.SetActive(false);
         StartCoroutine(PlayerManager.SpawnPlayers());
     }
+
 }
+public enum PlayerState { Menu, Single, Host, Remote, Spectator }

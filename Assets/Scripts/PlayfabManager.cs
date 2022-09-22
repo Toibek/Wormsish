@@ -7,6 +7,8 @@ using PlayFab.ClientModels;
 using PlayFab.Party;
 using TMPro;
 using UnityEngine.UI;
+using System;
+
 public class PlayfabManager : MonoBehaviour
 {
     public string PartyString;
@@ -15,9 +17,13 @@ public class PlayfabManager : MonoBehaviour
     PlayFabAuthenticationContext _authCont;
     List<FriendInfo> _friends;
 
+    public EmptyDelegate OnLoginComplete;
+    public StringsDelegate OnFriendsFetched;
+
+    public delegate void EmptyDelegate();
+    public delegate void StringsDelegate(string[] strings);
     private void OnApplicationQuit()
     {
-
         if (PlayFabMultiplayerManager.Get().State == PlayFabMultiplayerManagerState.ConnectedToNetwork)
             LeaveParty();
         RemovePersonalData("activeGame");
@@ -51,7 +57,8 @@ public class PlayfabManager : MonoBehaviour
     void OnRetrievedName(GetAccountInfoResult result)
     {
         DisplayName = result.AccountInfo.TitleInfo.DisplayName;
-        if (string.IsNullOrEmpty(EnteredName) && DisplayName != EnteredName) ChangeName(name);
+        if (!string.IsNullOrEmpty(EnteredName) && DisplayName != EnteredName) ChangeName(EnteredName);
+        else OnLoginComplete?.Invoke();
         Debug.Log("Got Name: " + DisplayName);
     }
 
@@ -67,19 +74,25 @@ public class PlayfabManager : MonoBehaviour
     void OnChangeName(UpdateUserTitleDisplayNameResult result)
     {
         Debug.Log("Name changed to: " + result.DisplayName);
+        OnLoginComplete?.Invoke();
     }
 
     public void AddFriend(string name)
     {
-        var request = new AddFriendRequest();
-        request.AuthenticationContext = _authCont;
-        request.FriendTitleDisplayName = name;
+        var request = new AddFriendRequest
+        {
+            AuthenticationContext = _authCont,
+            FriendTitleDisplayName = name
+        };
         PlayFabClientAPI.AddFriend(request, OnFriendAdded, OnPlayfabError);
     }
     void OnFriendAdded(AddFriendResult result)
     {
         if (result.Created)
+        {
             Debug.Log("Friend added");
+            GetFriendsList();
+        }
     }
 
     public void GetFriendsList()
@@ -98,10 +111,19 @@ public class PlayfabManager : MonoBehaviour
     void OnRetrievedFriendsList(GetFriendsListResult result)
     {
         _friends = result.Friends;
+        string[] friends = new string[_friends.Count];
+        _friends.Sort((x, y) => DateTime.Compare((DateTime)y.Profile.LastLogin, (DateTime)x.Profile.LastLogin));
         for (int i = 0; i < _friends.Count; i++)
         {
+            friends[i] = _friends[i].TitleDisplayName;
             Debug.Log(_friends[i].TitleDisplayName + _friends[i].Profile.LastLogin);
         }
+        Debug.Log("Friends fetched");
+        OnFriendsFetched?.Invoke(friends);
+    }
+    public void JoinFriend(string name)
+    {
+        GetUserData(name, "activeGame");
     }
 
     public void SetPersonalData(string key, string value)
@@ -127,11 +149,11 @@ public class PlayfabManager : MonoBehaviour
     {
         Debug.Log("Data Updated");
     }
-    public void GetUserData(string name, string data)
+    public void GetUserData(string user, string data)
     {
         for (int i = 0; i < _friends.Count; i++)
         {
-            if (_friends[i].TitleDisplayName == name)
+            if (_friends[i].TitleDisplayName == user)
             {
                 var request = new GetUserDataRequest
                 {

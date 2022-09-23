@@ -185,7 +185,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 33180841}
-  m_LocalRotation: {x: 0.28823796, y: -0.607718, z: 0.25172502, w: 0.695868}
+  m_LocalRotation: {x: 0.28823796, y: -0.60771793, z: 0.251725, w: 0.6958681}
   m_LocalPosition: {x: 9.908964, y: 10, z: -1.346268}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -282,6 +282,7 @@ GameObject:
   - component: {fileID: 264845336}
   - component: {fileID: 264845337}
   - component: {fileID: 264845338}
+  - component: {fileID: 264845339}
   m_Layer: 0
   m_Name: MapGenerator
   m_TagString: Untagged
@@ -317,6 +318,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _im: {fileID: 264845338}
+  _og: {fileID: 264845339}
 --- !u!114 &264845338
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -331,13 +333,44 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _cubesToPreload: 5000
   Size: 75
-  Layers: 3
-  NoiseDensity: 80
-  Neighbors: 5
-  Iterations: 6
+  Layers: 5
+  NoiseDensity: 100
+  Neighbors: 6
+  _baseIterations: 2
+  _taperingIterations: 8
   _cubePrefab: {fileID: 3565617082097576659, guid: 7b7066fb3c27d5949ac6a80c3fcd665b, type: 3}
   _topMaterial: {fileID: 2100000, guid: 97d9c5304ab5e6e4d95380f6b924640e, type: 2}
   _botMaterial: {fileID: 2100000, guid: 04b58bca9c90eae45b3ff3c30fdc52f7, type: 2}
+--- !u!114 &264845339
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 264845334}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a4b2b2848afde8f49aef26ad30b83bfe, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  SpawnHeight: 50
+  _objects:
+  - Name: Barrel
+    Prefab: {fileID: 576150762740661281, guid: 629cac98301e8a545b58b4f7d6a6b898, type: 3}
+    Size: {x: 1, y: 1, z: 1}
+    Amount: 5
+  - Name: Healthpack
+    Prefab: {fileID: 5401020676975986223, guid: b6fc0563d4c91d94c9f1610f4957637e, type: 3}
+    Size: {x: 1, y: 1, z: 1}
+    Amount: 5
+  - Name: Mine
+    Prefab: {fileID: 4972194456566260600, guid: eedf620ad67a31846ba8547904137bda, type: 3}
+    Size: {x: 1, y: 1, z: 1}
+    Amount: 5
+  - Name: Respawn
+    Prefab: {fileID: 7409025597537574716, guid: b75b993c341955441b5aafa68680474a, type: 3}
+    Size: {x: 1, y: 1, z: 1}
+    Amount: 0
 --- !u!1 &327121483
 GameObject:
   m_ObjectHideFlags: 0
@@ -1963,9 +1996,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
-        m_MethodName: StartGame
+      - m_Target: {fileID: 264845337}
+        m_TargetAssemblyTypeName: TempGenerator, Assembly-CSharp
+        m_MethodName: Generate
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -2160,7 +2193,7 @@ MonoBehaviour:
   m_XAxis:
     Value: 0
     m_SpeedMode: 0
-    m_MaxSpeed: 200
+    m_MaxSpeed: 300
     m_AccelTime: 0.1
     m_DecelTime: 0.1
     m_InputAxisName: Mouse X

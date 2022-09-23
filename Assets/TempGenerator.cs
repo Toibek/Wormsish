@@ -5,9 +5,25 @@ using UnityEngine;
 public class TempGenerator : MonoBehaviour
 {
     [SerializeField] IslandManager _im;
-    // Start is called before the first frame update
-    void Start()
+    [SerializeField] ObjectManager _og;
+    Coroutine routine;
+    private void Start()
     {
-        StartCoroutine(_im.GenerationRoutine());
+        Generate();
+    }
+    public void Generate()
+    {
+        if (routine == null)
+            routine = StartCoroutine(TestGen());
+    }
+    IEnumerator TestGen()
+    {
+        _og.ClearObjects();
+        _im.ClearMap();
+        yield return StartCoroutine(_im.GenerationRoutine());
+        bool[,] placeable = _im.PlaceableArea;
+        yield return StartCoroutine(_og.GenerateObjects(placeable));
+
+        routine = null;
     }
 }

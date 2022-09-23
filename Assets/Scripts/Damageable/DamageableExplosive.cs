@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class DamageableExplosive : Damageable
+public class DamageableExplosive : DamageableObject
 {
     [SerializeField] private GameObject _prefabExplosion;
     [SerializeField] private int _damage;

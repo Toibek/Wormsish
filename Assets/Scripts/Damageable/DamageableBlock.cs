@@ -8,6 +8,5 @@ public class DamageableBlock : Damageable
     {
         //Callback to save the block
         GetComponentInParent<IslandManager>().RemoveCube(gameObject);
-        base.LethalDamage();
     }
 }

@@ -6,13 +6,13 @@ public class GameManager : MonoBehaviour
 {
     public PlayerState PlayerState = PlayerState.Menu;
     public IslandManager IslandGen;
-    public ObjectGen ObjectGen;
+    public ObjectManager ObjectGen;
     public PlayerManager PlayerManager;
 
     public GameObject SetupUI;
     private void Start()
     {
-        StartCoroutine(MapSpawn());
+
     }
     IEnumerator MapSpawn()
     {

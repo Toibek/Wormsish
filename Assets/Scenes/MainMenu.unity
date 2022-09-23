@@ -6212,7 +6212,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0c058cb0af5b05143830988a6ab895f0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _pfManager: {fileID: 0}
+  _pfManager: {fileID: 785174504}
   LoginView: {fileID: 349973866}
   loginNameField: {fileID: 585640747}
   MainView: {fileID: 697994069}
@@ -8912,7 +8912,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 563688744}
         m_TargetAssemblyTypeName: MenuManager, Assembly-CSharp
-        m_MethodName: PlayOnline
+        m_MethodName: Login
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -10271,8 +10271,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dda6fa44328cd7349a3f2c8613ed7773, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  SpawnHeight: 4
-  _objects: []
 --- !u!114 &785174509
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10290,7 +10288,8 @@ MonoBehaviour:
   Layers: 3
   NoiseDensity: 86
   Neighbors: 5
-  Iterations: 6
+  _baseIterations: 4
+  _taperingIterations: 6
   _cubePrefab: {fileID: 3565617082097576659, guid: 7b7066fb3c27d5949ac6a80c3fcd665b, type: 3}
   _topMaterial: {fileID: 2100000, guid: 97d9c5304ab5e6e4d95380f6b924640e, type: 2}
   _botMaterial: {fileID: 2100000, guid: 04b58bca9c90eae45b3ff3c30fdc52f7, type: 2}
@@ -14085,7 +14084,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 563688744}
         m_TargetAssemblyTypeName: MenuManager, Assembly-CSharp
-        m_MethodName: PlayOffline
+        m_MethodName: Offline
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

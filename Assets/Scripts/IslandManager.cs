@@ -17,22 +17,22 @@ public class IslandManager : MonoBehaviour
     [SerializeField] private int Layers = 3;
     [SerializeField] [Range(0, 100)] private int NoiseDensity = 86;
     [SerializeField] [Range(1, 7)] private int Neighbors = 5;
-    [SerializeField] [Range(0, 20)] private int Iterations = 6;
+    [SerializeField] [Range(0, 20)] private int _baseIterations = 4;
+    [SerializeField] [Range(0, 20)] private int _taperingIterations = 6;
     [Header("Cube settings")]
     [SerializeField] GameObject _cubePrefab;
     [SerializeField] Material _topMaterial;
     [SerializeField] Material _botMaterial;
 
-    List<GameObject> _inactiveCubes = new List<GameObject>();
-    List<GameObject> _activeCubes = new List<GameObject>();
+    private List<GameObject> _inactiveCubes = new List<GameObject>();
 
     GameObject[,,] _activeMapObjects;
     bool[,,] _activeMap;
-
-    private Coroutine preLoadRoutine;
+    Vector3 _mapOffset;
+    private Coroutine _preLoadRoutine;
     private void Start()
     {
-        preLoadRoutine = StartCoroutine(PreloadCubes());
+        _preLoadRoutine = StartCoroutine(PreloadCubes());
     }
     /// <summary>
     /// Preloading cubes and saving them as inactive so that it can be fetched without needing to instantiate.
@@ -48,38 +48,46 @@ public class IslandManager : MonoBehaviour
                 yield return new WaitForEndOfFrame();
         }
     }
+    public void ClearMap()
+    {
+        //Remove active cubes
+        if (_activeMapObjects != null)
+            for (int y = _activeMapObjects.GetLength(1) - 1; y >= 0; y--)
+            {
+                for (int x = 0; x < _activeMapObjects.GetLength(0); x++)
+                    for (int z = 0; z < _activeMapObjects.GetLength(2); z++)
+                        if (_activeMapObjects[x, y, z] != null)
+                            RemoveCube(_activeMapObjects[x, y, z]);
+            }
+    }
     /// <summary>
     /// A coroutine to create the base level, allowing for breaks in the creation.
     /// </summary>
     public IEnumerator GenerationRoutine(int seed = -1, bool[,,] preGenerated = null)
     {
         //Stop preloading if it's active
-        if (preLoadRoutine != null)
+        if (_preLoadRoutine != null)
         {
-            StopCoroutine(preLoadRoutine);
-            preLoadRoutine = null;
+            StopCoroutine(_preLoadRoutine);
+            _preLoadRoutine = null;
         }
-        //Remove active cubes
-        for (int i = _activeCubes.Count - 1; i >= 0; i--)
-            RemoveCube(_activeCubes[i]);
-        yield return new WaitForEndOfFrame();
 
-        //Get the base maps from the Cellular automata generator
-        //List<bool[,]> maps = new List<bool[,]>();
-        bool[,,] maps = Cellular.GenerateArray(seed, Layers, Size, NoiseDensity, Neighbors, Iterations);
         //Place the cubes in the enabled positions
-        Vector3Int offset = new(-maps.GetLength(0) / 2, 0, -maps.GetLength(2) / 2);
-        PlaceableArea = new bool[maps.GetLength(0), maps.GetLength(2)];
-        for (int y = 0; y < maps.GetLength(1); y++)
+        _activeMap = Cellular.GenerateArray(seed, Layers, Size, NoiseDensity, Neighbors, _baseIterations, _taperingIterations);
+        _activeMapObjects = new GameObject[_activeMap.GetLength(0), _activeMap.GetLength(1), _activeMap.GetLength(2)];
+        _mapOffset = new(-_activeMap.GetLength(0) / 2, 0, -_activeMap.GetLength(2) / 2);
+        PlaceableArea = new bool[_activeMap.GetLength(0), _activeMap.GetLength(2)];
+        for (int y = 0; y < _activeMap.GetLength(1); y++)
         {
-            for (int x = 0; x < maps.GetLength(0) - y; x++)
+            for (int x = 0; x < _activeMap.GetLength(0); x++)
             {
-                for (int z = 0; z < maps.GetLength(2) - z; z++)
+                for (int z = 0; z < _activeMap.GetLength(2); z++)
                 {
-                    if (maps[x, y, z])
+                    if (_activeMap[x, y, z])
                     {
-                        GameObject go = GetCube(new Vector3(x, z, z) + offset);
-                        if (y < maps.GetLength(1) - 1 && maps[x, y + 1, z])
+                        GameObject go = GetCube(new Vector3(x, y, z) + _mapOffset);
+                        _activeMapObjects[x, y, z] = go;
+                        if (y < _activeMap.GetLength(1) - 1 && _activeMap[x, y + 1, z])
                             go.GetComponent<MeshRenderer>().material = _botMaterial;
                         else
                         {
@@ -108,14 +116,12 @@ public class IslandManager : MonoBehaviour
             go.transform.position = position;
             go.SetActive(true);
             _inactiveCubes.Remove(go);
-            _activeCubes.Add(go);
             return go;
         }
         else
         {
             //Create and place a new cube
             GameObject go = Instantiate(_cubePrefab, position, Quaternion.identity, transform);
-            _activeCubes.Add(go);
             return go;
         }
     }
@@ -125,8 +131,10 @@ public class IslandManager : MonoBehaviour
     /// <param name="cube">The cube to remove</param>
     public void RemoveCube(GameObject cube)
     {
+        Vector3 pos = cube.transform.position - _mapOffset;
         //hide and save the cube
-        _activeCubes.Remove(cube);
+        _activeMapObjects[(int)pos.x, (int)pos.y, (int)pos.z] = null;
+        _activeMap[(int)pos.x, (int)pos.y, (int)pos.z] = false;
         cube.SetActive(false);
         _inactiveCubes.Add(cube);
     }

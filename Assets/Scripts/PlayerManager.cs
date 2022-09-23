@@ -13,7 +13,7 @@ public class PlayerManager : MonoBehaviour
     [Space]
     [SerializeField] private GameObject _unitPrefab;
     [SerializeField] private Material _unitMaterial;
-    [SerializeField] private ObjectGen _objectGen;
+    [SerializeField] private ObjectManager _objectGen;
     [SerializeField] private CinemachineVirtualCamera _followCam;
     [SerializeField] private CinemachineOrbitalTransposer _followOrbital;
     [Space]

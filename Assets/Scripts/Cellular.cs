@@ -17,7 +17,7 @@ public static class Cellular
             seed = Random.Range(-99999, 99999);
         Seed = seed;
 
-        bool[,,] pixels = Create(seed, new(size + 25, layers, size + 25), noise);
+        bool[,,] pixels = Create(seed, new(size, layers, size), noise);
         for (int i = 0; i < baseIterations; i++)
             pixels = Iterate(pixels, neighbors, 0);
         for (int i = 0; i < TaperingIterations; i++)

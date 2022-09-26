@@ -4,17 +4,45 @@ using UnityEngine;
 
 public class ObjectManager : MonoBehaviour
 {
-    [SerializeField] float SpawnHeight = 4;
+    public string SpawnString
+    {
+        get
+        {
+            string s = "O:";
+            for (int i = 0; i < _activeObjects.Count; i++)
+            {
+                s += GetObjectInt(_activeObjects[i].name) + ",";
+                Vector3 pos = _activeObjects[i].transform.position;
+                s += (int)pos.x + "," + pos.z;
+                s += ":";
+            }
+            s = s.Trim(':');
+            _spawnString = s;
+            return s;
+        }
+    }
+    [SerializeField] string _spawnString;
+    [Space]
     [SerializeField] private SpawnableObject[] _objects;
+
     List<Vector2Int> _avaliablePos;
     List<GameObject> _activeObjects = new();
 
+    int GetObjectInt(string name)
+    {
+        for (int i = 0; i < _objects.Length; i++)
+        {
+            if (name == _objects[i].Name)
+                return i;
+        }
+        return -1;
+    }
     public void ClearObjects()
     {
         for (int i = _activeObjects.Count - 1; i >= 0; i--)
             Decomission(_activeObjects[i]);
     }
-    public IEnumerator GenerateObjects(bool[,] placeableArea)
+    public string SpawnObjects(bool[,] placeableArea)
     {
         Vector2Int offset = new(-placeableArea.GetLength(0) / 2, -placeableArea.GetLength(1) / 2);
         _avaliablePos = new List<Vector2Int>();
@@ -32,15 +60,45 @@ public class ObjectManager : MonoBehaviour
             {
                 Vector2Int pos = _avaliablePos[Random.Range(0, _avaliablePos.Count)];
                 _avaliablePos.Remove(pos);
-
-                Vector3 place = new(pos.x, SpawnHeight, pos.y);
-                GameObject go = Instantiate(obj.Prefab, place, Quaternion.identity, transform);
+                Ray ray = new(new(pos.x, 100, pos.y), Vector3.down);
+                Vector3 place = new(pos.x, 0, pos.y);
+                if (Physics.Raycast(ray, out var hit, Mathf.Infinity))
+                    place.y = hit.point.y + 0.5f;
+                else
+                    place.y = 10;
+                GameObject go = obj.GetObject(place, transform);
                 go.GetComponent<DamageableObject>().ObjectManager = this;
                 go.name = obj.Name;
                 _activeObjects.Add(go);
-                yield return new WaitForEndOfFrame();
             }
         }
+        return SpawnString;
+    }
+    public string SpawnObjects(string input)
+    {
+        List<string> newSplit = new(input.Split(':'));
+        List<string> oldSplit = new(SpawnString.Split(':'));
+        for (int i = newSplit.Count - 1; i >= 1; i--)
+        {
+            if (oldSplit.Contains(newSplit[i]))
+                newSplit.RemoveAt(i);
+        }
+        for (int i = 1; i < newSplit.Count; i++)
+        {
+            string[] objectToSpawn = newSplit[i].Split(',');
+            SpawnableObject obj = _objects[int.Parse(objectToSpawn[0])];
+            Vector3 pos = new(float.Parse(objectToSpawn[1]), 0, float.Parse(objectToSpawn[2]));
+            Ray ray = new(new(pos.x, 100, pos.z), Vector3.down);
+            if (Physics.Raycast(ray, out var hit, Mathf.Infinity))
+                pos.y = hit.point.y + 0.5f;
+            else
+                pos.y = 10f;
+            GameObject go = obj.GetObject(pos, transform);
+            go.GetComponent<DamageableObject>().ObjectManager = this;
+            go.name = obj.Name;
+            _activeObjects.Add(go);
+        }
+        return SpawnString;
     }
     public List<GameObject> More(string name, int amount)
     {
@@ -63,7 +121,12 @@ public class ObjectManager : MonoBehaviour
         {
             Vector2Int pos = _avaliablePos[Random.Range(0, _avaliablePos.Count)];
             _avaliablePos.Remove(pos);
-            Vector3 place = new(pos.x, SpawnHeight, pos.y);
+            Ray ray = new(new(pos.x, 100, pos.y), Vector3.down);
+            Vector3 place;
+            if (Physics.Raycast(ray, out var hit, Mathf.Infinity))
+                place = hit.point + new Vector3(0, 0.5f, 0);
+            else
+                place = new(pos.x, 10, pos.y);
             GameObject go = obj.GetObject(place, transform);
             output.Add(go);
             go.GetComponent<DamageableObject>().ObjectManager = this;
@@ -89,7 +152,7 @@ public class ObjectManager : MonoBehaviour
     }
 }
 [System.Serializable]
-public struct SpawnableObject
+public class SpawnableObject : object
 {
     public string Name;
     public GameObject Prefab;
@@ -98,7 +161,7 @@ public struct SpawnableObject
     internal List<GameObject> InactiveObjects;
     public GameObject GetObject(Vector3 position, Transform parent)
     {
-        if (InactiveObjects == null) new List<GameObject>();
+        if (InactiveObjects == null) InactiveObjects = new List<GameObject>();
         if (InactiveObjects.Count > 0)
         {
             GameObject go = InactiveObjects[0];
@@ -114,7 +177,7 @@ public struct SpawnableObject
     }
     public void DeactivateObject(GameObject go)
     {
-        if (InactiveObjects == null) new List<GameObject>();
+        if (InactiveObjects == null) InactiveObjects = new List<GameObject>();
         InactiveObjects.Add(go);
         go.SetActive(false);
     }

@@ -5,8 +5,6 @@ using UnityEngine;
 public class Mine : MonoBehaviour
 {
     [SerializeField] private int _delay;
-    [SerializeField] private int _damage;
-    [SerializeField] private GameObject _explosionPrefab;
     [SerializeField] private float _jumpForce;
     [SerializeField] private bool _testTrigger;
     private Coroutine _activeRoutine;
@@ -37,9 +35,7 @@ public class Mine : MonoBehaviour
             _rb.AddForce(new(0, _jumpForce, 0));
             yield return new WaitForSeconds(1);
         }
-        GameObject go = Instantiate(_explosionPrefab, transform.position, Quaternion.identity);
-        go.GetComponent<Explosion>().StartExplosive(_damage);
-        Destroy(gameObject);
+        GetComponent<Damageable>().LethalDamage();
 
     }
 }

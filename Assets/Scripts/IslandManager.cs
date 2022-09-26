@@ -9,7 +9,57 @@ public class IslandManager : MonoBehaviour
     If there's anything missing from this it's to optimize the cubes themselves in order to make it take up less
     rendering time. seems to work perfectly fine with the current setup so currently set on the backburner.
      */
-
+    public string SpawnString
+    {
+        get
+        {
+            string s = "I:";
+            int n = 0;
+            bool val = false;
+            for (int y = 0; y < _activeMap.GetLength(1); y++)
+            {
+                for (int x = 0; x < _activeMap.GetLength(0); x++)
+                {
+                    string ss = y + "," + x + ",";
+                    for (int z = 0; z < _activeMap.GetLength(2); z++)
+                    {
+                        if (_activeMap[x, y, z])
+                        {
+                            if (val) n++;
+                            else
+                            {
+                                ss += n + "f,";
+                                n = 1;
+                                val = true;
+                            }
+                        }
+                        else
+                        {
+                            if (!val) n++;
+                            else
+                            {
+                                ss += n + "t,";
+                                n = 1;
+                                val = false;
+                            }
+                        }
+                    }
+                    ss = ss.Trim(',');
+                    if (val)
+                        ss += n + "t";
+                    if (n != _activeMap.GetLength(2))
+                        s += ss + ":";
+                    n = 0;
+                    val = false;
+                }
+            }
+            s = s.Trim(':');
+            _spawnString = s;
+            return s;
+        }
+    }
+    [SerializeField] string _spawnString;
+    [Space]
     internal bool[,] PlaceableArea;
     [Header("Generation settings")]
     [SerializeField] private int _cubesToPreload = 5000;
@@ -61,9 +111,9 @@ public class IslandManager : MonoBehaviour
             }
     }
     /// <summary>
-    /// A coroutine to create the base level, allowing for breaks in the creation.
+    /// A function to create the base level, allowing for breaks in the creation.
     /// </summary>
-    public IEnumerator GenerationRoutine(int seed = -1, bool[,,] preGenerated = null)
+    public string GenerateIsland(int seed = -1, bool[,,] preGen = null)
     {
         //Stop preloading if it's active
         if (_preLoadRoutine != null)
@@ -72,11 +122,15 @@ public class IslandManager : MonoBehaviour
             _preLoadRoutine = null;
         }
 
-        //Place the cubes in the enabled positions
-        _activeMap = Cellular.GenerateArray(seed, Layers, Size, NoiseDensity, Neighbors, _baseIterations, _taperingIterations);
+        if (preGen == null)
+            _activeMap = Cellular.GenerateArray(seed, Layers, Size, NoiseDensity, Neighbors, _baseIterations, _taperingIterations);
+
+        else
+            _activeMap = preGen;
+
         _activeMapObjects = new GameObject[_activeMap.GetLength(0), _activeMap.GetLength(1), _activeMap.GetLength(2)];
-        _mapOffset = new(-_activeMap.GetLength(0) / 2, 0, -_activeMap.GetLength(2) / 2);
-        PlaceableArea = new bool[_activeMap.GetLength(0), _activeMap.GetLength(2)];
+        _mapOffset = new(-Size / 2, 0, -Size / 2);
+        PlaceableArea = new bool[Size, Size];
         for (int y = 0; y < _activeMap.GetLength(1); y++)
         {
             for (int x = 0; x < _activeMap.GetLength(0); x++)
@@ -96,10 +150,40 @@ public class IslandManager : MonoBehaviour
                         }
                     }
                 }
-                yield return new WaitForEndOfFrame();
             }
         }
-        yield return new WaitForEndOfFrame();
+        return SpawnString;
+    }
+    public string GenerateIsland(string input)
+    {
+        Debug.Log(input.Replace(':', '\n'));
+        bool[,,] output = new bool[Size, Layers, Size];
+        string[] rows = input.Split(':')[1..];
+        for (int i = 0; i < rows.Length; i++)
+        {
+            string[] rules = rows[i].Split(',');
+            int y = int.Parse(rules[0]);
+            int x = int.Parse(rules[1]);
+            int z = 0;
+            for (int r = 2; r < rules.Length; r++)
+            {
+                if ((rules[r][^1]) == 'f')
+                {
+                    z += int.Parse(rules[r][0..^1]);
+                }
+                else if (rules[r][^1] == 't')
+                {
+                    for (int b = 0; b < int.Parse(rules[r][0..^1]); b++)
+                    {
+                        output[x, y, z + b] = true;
+                    }
+                    z += int.Parse(rules[r][0..^1]);
+                }
+                else
+                    Debug.Log("Not f or t");
+            }
+        }
+        return GenerateIsland(preGen: output);
     }
     /// <summary>
     /// Returning a cube, Making sure to instantiate if there's no avaliable inactive cubes

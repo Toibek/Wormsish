@@ -12,9 +12,9 @@ public class HealthPack : MonoBehaviour
     }
     private void OnTriggerEnter(Collider other)
     {
-        if (other.GetComponent<Damageable>())
+        if (other.GetComponent<UnitDamageable>())
         {
-            other.GetComponent<Damageable>().Heal(_value);
+            other.GetComponent<UnitDamageable>().Heal(_value);
             GetComponent<Damageable>().LethalDamage();
         }
     }

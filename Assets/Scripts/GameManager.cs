@@ -10,15 +10,11 @@ public class GameManager : MonoBehaviour
     public PlayerManager PlayerManager;
 
     public GameObject SetupUI;
-    private void Start()
-    {
-
-    }
     IEnumerator MapSpawn()
     {
-        yield return StartCoroutine(IslandGen.GenerationRoutine());
+        yield return StartCoroutine(IslandGen.GenerateIsland());
         bool[,] placeable = IslandGen.PlaceableArea;
-        yield return StartCoroutine(ObjectGen.GenerateObjects(placeable));
+        yield return StartCoroutine(ObjectGen.SpawnObjects(placeable));
     }
     public void StartGame()
     {

@@ -3,26 +3,28 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
-using Doozy.Engine.UI;
 
 public class MenuManager : MonoBehaviour
 {
     string _username;
     [SerializeField] PlayfabManager _pfManager;
     [Header("Login")]
-    [SerializeField] UIView LoginView;
+    [SerializeField] View LoginView;
     [SerializeField] TMP_InputField loginNameField;
     [Header("MainMenu")]
-    [SerializeField] UIView MainView;
+    [SerializeField] View MainView;
     [SerializeField] Button HostButton;
     [SerializeField] Button SocialButton;
     [Header("Friends")]
-    [SerializeField] UIView FriendView;
+    [SerializeField] View FriendView;
     [SerializeField] Transform FriendHolder;
     [SerializeField] TMP_InputField NewFriendField;
     [SerializeField] Button PrefabFriendButton;
+
+    GameManager _gm;
     private void Start()
     {
+        _gm = GameObject.Find("GameManager").GetComponent<GameManager>();
         _username = PlayerPrefs.GetString("username");
         if (!string.IsNullOrEmpty(_username))
             loginNameField.text = _username;
@@ -51,7 +53,7 @@ public class MenuManager : MonoBehaviour
     }
     public void ToggleFriends()
     {
-        if (FriendView.IsActive())
+        if (FriendView.gameObject.activeInHierarchy)
             HideFriends();
         else
             ShowFriends();

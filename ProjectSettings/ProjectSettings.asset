@@ -712,22 +712,23 @@ PlayerSettings:
   webGLThreadsSupport: 0
   webGLDecompressionFallback: 0
   scriptingDefineSymbols:
-    Android: dUI_MANAGER
-    EmbeddedLinux: dUI_MANAGER
-    GameCoreScarlett: dUI_MANAGER
-    GameCoreXboxOne: dUI_MANAGER
+    Android: 
+    CloudRendering: 
+    EmbeddedLinux: 
+    GameCoreScarlett: 
+    GameCoreXboxOne: 
     LinuxHeadlessSimulation: dUI_MANAGER
-    Lumin: dUI_MANAGER
-    Nintendo Switch: dUI_MANAGER
-    PS4: dUI_MANAGER
-    PS5: dUI_MANAGER
-    Stadia: dUI_MANAGER
-    Standalone: dUI_MANAGER
-    WebGL: dUI_MANAGER
-    Windows Store Apps: dUI_MANAGER
-    XboxOne: dUI_MANAGER
-    iPhone: dUI_MANAGER
-    tvOS: dUI_MANAGER
+    Lumin: 
+    Nintendo Switch: 
+    PS4: 
+    PS5: 
+    Stadia: 
+    Standalone: 
+    WebGL: 
+    Windows Store Apps: 
+    XboxOne: 
+    iPhone: 
+    tvOS: 
   additionalCompilerArguments: {}
   platformArchitecture: {}
   scriptingBackend:

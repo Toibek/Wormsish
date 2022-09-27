@@ -29,7 +29,7 @@ public class PlayerManager : MonoBehaviour
     private InputHandler _inputHandler;
     private void Start()
     {
-        _followOrbital = _followCam.GetCinemachineComponent<CinemachineOrbitalTransposer>();
+        //_followOrbital = _followCam.GetCinemachineComponent<CinemachineOrbitalTransposer>();
         _inputHandler = GetComponent<InputHandler>();
     }
     private void MoveUnit(Vector2 moveDirection)

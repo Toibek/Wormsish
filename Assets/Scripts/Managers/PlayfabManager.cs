@@ -14,15 +14,19 @@ public class PlayfabManager : MonoBehaviour
 {
     public string PartyString;
     public string DisplayName;
-    public string EnteredName;
+    private string _enteredName;
     PlayFabAuthenticationContext _authCont;
     List<FriendInfo> _friends;
 
     public EmptyDelegate OnLoginComplete;
-    public StringsDelegate OnFriendsFetched;
+    public ArgsDelegate OnFriendsFetched;
+
+    public DataDelegate OnChatRecieved;
+    public DataDelegate OnDataRecieved;
 
     public delegate void EmptyDelegate();
-    public delegate void StringsDelegate(string[] strings);
+    public delegate void ArgsDelegate(string[] args);
+    public delegate void DataDelegate(string data);
     private void OnApplicationQuit()
     {
         if (PlayFabMultiplayerManager.Get().State == PlayFabMultiplayerManagerState.ConnectedToNetwork)
@@ -32,7 +36,7 @@ public class PlayfabManager : MonoBehaviour
     #region ClientStuff
     public void Login(string nameEntered)
     {
-        EnteredName = nameEntered;
+        _enteredName = nameEntered;
         var request = new LoginWithCustomIDRequest
         {
             CustomId = SystemInfo.deviceUniqueIdentifier,
@@ -58,7 +62,7 @@ public class PlayfabManager : MonoBehaviour
     void OnRetrievedName(GetAccountInfoResult result)
     {
         DisplayName = result.AccountInfo.TitleInfo.DisplayName;
-        if (!string.IsNullOrEmpty(EnteredName) && DisplayName != EnteredName) ChangeName(EnteredName);
+        if (!string.IsNullOrEmpty(_enteredName) && DisplayName != _enteredName) ChangeName(_enteredName);
         else OnLoginComplete?.Invoke();
         Debug.Log("Got Name: " + DisplayName);
     }
@@ -74,6 +78,7 @@ public class PlayfabManager : MonoBehaviour
     }
     void OnChangeName(UpdateUserTitleDisplayNameResult result)
     {
+        DisplayName = result.DisplayName;
         Debug.Log("Name changed to: " + result.DisplayName);
         OnLoginComplete?.Invoke();
     }
@@ -243,6 +248,7 @@ public class PlayfabManager : MonoBehaviour
     {
         string incoming = Encoding.Default.GetString(buffer);
         string message = "Data:" + from + ":" + incoming;
+        OnDataRecieved?.Invoke(message);
         Debug.Log(message);
     }
     private void OnPartyError(object sender, PlayFabMultiplayerManagerErrorArgs args)

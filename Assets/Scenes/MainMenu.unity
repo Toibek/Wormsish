@@ -603,7 +603,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1e61bdd522c73e44cac248f4492556de, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Transition: 1
+  Transition: 0
   MoveDirection: 3
   ShowPosition: {x: 0, y: 0, z: 0}
   CustomHidePosition: {x: 0, y: 0, z: 0}
@@ -916,7 +916,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &449648582
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1116,10 +1116,10 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: Doozy.Engine.UI.UIView, Assembly-CSharp
-        m_MethodName: Toggle
-        m_Mode: 6
+      - m_Target: {fileID: 563688744}
+        m_TargetAssemblyTypeName: MenuManager, Assembly-CSharp
+        m_MethodName: LocalGame
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -1210,16 +1210,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0c058cb0af5b05143830988a6ab895f0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _pfManager: {fileID: 785174504}
-  LoginView: {fileID: 349973871}
-  loginNameField: {fileID: 585640747}
-  MainView: {fileID: 697994071}
-  HostButton: {fileID: 1940977804}
-  SocialButton: {fileID: 1834035640}
-  FriendView: {fileID: 1018517603}
-  FriendHolder: {fileID: 949472308}
-  NewFriendField: {fileID: 688372101}
-  PrefabFriendButton: {fileID: 5880457143049272382, guid: 531d925940272b84aba30be5718ddb8d, type: 3}
+  _playFabManager: {fileID: 0}
+  _loginView: {fileID: 349973871}
+  _loginNameField: {fileID: 585640747}
+  _mainView: {fileID: 697994071}
+  _hostButton: {fileID: 1940977804}
+  _socialButton: {fileID: 1834035640}
+  _friendView: {fileID: 1018517603}
+  _friendHolder: {fileID: 949472308}
+  _newFriendField: {fileID: 688372101}
+  _prefabFriendButton: {fileID: 5880457143049272382, guid: 531d925940272b84aba30be5718ddb8d, type: 3}
 --- !u!1 &585640745
 GameObject:
   m_ObjectHideFlags: 0
@@ -2456,6 +2456,7 @@ GameObject:
   - component: {fileID: 785174505}
   - component: {fileID: 785174504}
   - component: {fileID: 785174509}
+  - component: {fileID: 785174511}
   - component: {fileID: 785174510}
   m_Layer: 0
   m_Name: GameManager
@@ -2519,10 +2520,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   PlayerState: 1
-  IslandGen: {fileID: 785174509}
-  ObjectGen: {fileID: 0}
-  PlayerManager: {fileID: 785174510}
-  SetupUI: {fileID: 0}
 --- !u!114 &785174509
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2569,6 +2566,20 @@ MonoBehaviour:
   _followOrbital: {fileID: 0}
   _movesHolder: {fileID: 0}
   _specialsHolder: {fileID: 0}
+--- !u!114 &785174511
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 785174503}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a4b2b2848afde8f49aef26ad30b83bfe, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _spawnString: 
+  _objects: []
 --- !u!1 &789312833
 GameObject:
   m_ObjectHideFlags: 0
@@ -3789,7 +3800,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Singleplayer
+  m_text: Local game
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -4258,10 +4269,10 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: Doozy.Engine.UI.UIView, Assembly-CSharp
-        m_MethodName: Toggle
-        m_Mode: 6
+      - m_Target: {fileID: 563688744}
+        m_TargetAssemblyTypeName: MenuManager, Assembly-CSharp
+        m_MethodName: Quit
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -5344,10 +5355,10 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: Doozy.Engine.UI.UIView, Assembly-CSharp
-        m_MethodName: Toggle
-        m_Mode: 6
+      - m_Target: {fileID: 563688744}
+        m_TargetAssemblyTypeName: MenuManager, Assembly-CSharp
+        m_MethodName: HostGame
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine

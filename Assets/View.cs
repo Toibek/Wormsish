@@ -97,6 +97,7 @@ public class View : MonoBehaviour
             switch (Transition)
             {
                 case Transition.Fade:
+                    _activeRoutine = StartCoroutine(HideFadeRoutine());
                     return true;
                 case Transition.Move:
                     _activeRoutine = StartCoroutine(HideMoveRoutine());

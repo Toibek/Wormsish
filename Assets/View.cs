@@ -20,7 +20,7 @@ public class View : MonoBehaviour
         _cg = GetComponent<CanvasGroup>();
         _rect = GetComponent<RectTransform>();
     }
-    public bool Show()
+    public void Show()
     {
         if (_activeRoutine == null)
         {
@@ -31,13 +31,12 @@ public class View : MonoBehaviour
             {
                 case Transition.Fade:
                     _activeRoutine = StartCoroutine(ShowFadeRoutine());
-                    return true;
+                    break;
                 case Transition.Move:
                     _activeRoutine = StartCoroutine(ShowMoveRoutine());
-                    return true;
+                    break;
             }
         }
-        return false;
     }
     IEnumerator ShowMoveRoutine()
     {
@@ -87,7 +86,7 @@ public class View : MonoBehaviour
         _cg.alpha = 1;
         _activeRoutine = null;
     }
-    public bool Hide()
+    public void Hide()
     {
         if (_activeRoutine == null)
         {
@@ -98,13 +97,12 @@ public class View : MonoBehaviour
             {
                 case Transition.Fade:
                     _activeRoutine = StartCoroutine(HideFadeRoutine());
-                    return true;
+                    break;
                 case Transition.Move:
                     _activeRoutine = StartCoroutine(HideMoveRoutine());
-                    return true;
+                    break;
             }
         }
-        return false;
     }
     IEnumerator HideMoveRoutine()
     {

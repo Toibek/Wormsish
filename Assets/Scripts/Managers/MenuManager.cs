@@ -6,8 +6,6 @@ using UnityEngine.UI;
 
 public class MenuManager : MonoBehaviour
 {
-    string _username;
-    [SerializeField] PlayfabManager _playFabManager;
     [Header("Login")]
     [SerializeField] View _loginView;
     [SerializeField] TMP_InputField _loginNameField;
@@ -25,23 +23,15 @@ public class MenuManager : MonoBehaviour
     private void Start()
     {
         _gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
-        _username = PlayerPrefs.GetString("username");
-        if (!string.IsNullOrEmpty(_username))
-            _loginNameField.text = _username;
     }
     public void Login()
     {
         _hostButton.interactable = true;
         _socialButton.interactable = true;
         _loginView.Hide();
-        _username = _loginNameField.text;
-        PlayerPrefs.SetString("username", _username);
-        _playFabManager.Login(_username);
-        _playFabManager.OnLoginComplete += OnLoginComplete;
     }
     void OnLoginComplete()
     {
-        _playFabManager.OnLoginComplete -= OnLoginComplete;
         _mainView.Show();
     }
     public void Offline()
@@ -61,8 +51,6 @@ public class MenuManager : MonoBehaviour
     void ShowFriends()
     {
         _friendView.Show();
-        _playFabManager.GetFriendsList();
-        _playFabManager.OnFriendsFetched += LoadFriends;
     }
     public void LoadFriends(string[] friends)
     {
@@ -80,16 +68,13 @@ public class MenuManager : MonoBehaviour
     public void JoinFriend(string name)
     {
         _gameManager.PlayerState = PlayerState.Remote;
-        _playFabManager.JoinFriend(name);
     }
     public void AddFriend()
     {
-        _playFabManager.AddFriend(_newFriendField.text);
     }
     void HideFriends()
     {
         _friendView.Hide();
-        _playFabManager.OnFriendsFetched -= LoadFriends;
     }
     public void LocalGame()
     {
@@ -98,7 +83,6 @@ public class MenuManager : MonoBehaviour
     public void HostGame()
     {
         _gameManager.PlayerState = PlayerState.Host;
-        _playFabManager.CreateParty();
     }
     public void Quit()
     {

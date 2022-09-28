@@ -4,25 +4,6 @@ using UnityEngine;
 
 public class ObjectManager : MonoBehaviour
 {
-    public string SpawnString
-    {
-        get
-        {
-            string s = "O:";
-            for (int i = 0; i < _activeObjects.Count; i++)
-            {
-                s += GetObjectInt(_activeObjects[i].name) + ",";
-                Vector3 pos = _activeObjects[i].transform.position;
-                s += (int)pos.x + "," + pos.z;
-                s += ":";
-            }
-            s = s.Trim(':');
-            _spawnString = s;
-            return s;
-        }
-    }
-    [SerializeField] string _spawnString;
-    [Space]
     [SerializeField] private SpawnableObject[] _objects;
 
     List<Vector2Int> _avaliablePos;
@@ -42,7 +23,7 @@ public class ObjectManager : MonoBehaviour
         for (int i = _activeObjects.Count - 1; i >= 0; i--)
             Decomission(_activeObjects[i]);
     }
-    public string SpawnObjects(bool[,] placeableArea)
+    public void SpawnObjects(bool[,] placeableArea)
     {
         Vector2Int offset = new(-placeableArea.GetLength(0) / 2, -placeableArea.GetLength(1) / 2);
         _avaliablePos = new List<Vector2Int>();
@@ -72,33 +53,6 @@ public class ObjectManager : MonoBehaviour
                 _activeObjects.Add(go);
             }
         }
-        return SpawnString;
-    }
-    public string SpawnObjects(string input)
-    {
-        List<string> newSplit = new(input.Split(':'));
-        List<string> oldSplit = new(SpawnString.Split(':'));
-        for (int i = newSplit.Count - 1; i >= 1; i--)
-        {
-            if (oldSplit.Contains(newSplit[i]))
-                newSplit.RemoveAt(i);
-        }
-        for (int i = 1; i < newSplit.Count; i++)
-        {
-            string[] objectToSpawn = newSplit[i].Split(',');
-            SpawnableObject obj = _objects[int.Parse(objectToSpawn[0])];
-            Vector3 pos = new(float.Parse(objectToSpawn[1]), 0, float.Parse(objectToSpawn[2]));
-            Ray ray = new(new(pos.x, 100, pos.z), Vector3.down);
-            if (Physics.Raycast(ray, out var hit, Mathf.Infinity))
-                pos.y = hit.point.y + 0.5f;
-            else
-                pos.y = 10f;
-            GameObject go = obj.GetObject(pos, transform);
-            go.GetComponent<DamageableObject>().ObjectManager = this;
-            go.name = obj.Name;
-            _activeObjects.Add(go);
-        }
-        return SpawnString;
     }
     public List<GameObject> More(string name, int amount)
     {

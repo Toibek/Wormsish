@@ -6,89 +6,95 @@ using UnityEngine.UI;
 
 public class MenuManager : MonoBehaviour
 {
-    [Header("Login")]
-    [SerializeField] View _loginView;
-    [SerializeField] TMP_InputField _loginNameField;
     [Header("MainMenu")]
     [SerializeField] View _mainView;
-    [SerializeField] Button _hostButton;
-    [SerializeField] Button _socialButton;
-    [Header("Friends")]
-    [SerializeField] View _friendView;
-    [SerializeField] Transform _friendHolder;
-    [SerializeField] TMP_InputField _newFriendField;
-    [SerializeField] Button _prefabFriendButton;
+    [Header("Setup")]
+    [SerializeField] View _setupView;
+    [SerializeField] View _mapView;
+    [Space]
+    [SerializeField] List<PlayerSettings> PlayerSettings;
+    [SerializeField] List<Button> AddPlayerButtons;
+    [Space]
+    [SerializeField] UpDownValue Units;
+    [SerializeField] UpDownValue Moves;
+    [SerializeField] UpDownValue Specials;
+    [SerializeField] UpDownValue Pickup;
+    [Space]
+    [SerializeField] UpDownValue Barrels;
+    [SerializeField] UpDownValue Mines;
+    [SerializeField] UpDownValue Healthpacks;
+    [Header("InGame")]
+    [SerializeField] View _hudView;
+    [Header("Settings")]
+    [SerializeField] View _settingsView;
 
     GameManager _gameManager;
+    IslandManager _islandManager;
+
+
     private void Start()
     {
-        _gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
+        _gameManager = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameManager>();
+        _islandManager = GameObject.FindGameObjectWithTag("Island").GetComponent<IslandManager>();
     }
-    public void Login()
+    #region Main Menu
+    public void StartSetup()
     {
-        _hostButton.interactable = true;
-        _socialButton.interactable = true;
-        _loginView.Hide();
+        _mainView.Hide();
+        _islandManager.GenerateIsland();
+        _setupView.Show();
     }
-    void OnLoginComplete()
+    public void OpenSettings()
     {
-        _mainView.Show();
+        //open the menu
     }
-    public void Offline()
+    public void CloseSettings()
     {
-        _hostButton.interactable = false;
-        _socialButton.interactable = false;
-        _loginView.Hide();
-        _mainView.Show();
-    }
-    public void ToggleFriends()
-    {
-        if (_friendView.gameObject.activeInHierarchy)
-            HideFriends();
-        else
-            ShowFriends();
-    }
-    void ShowFriends()
-    {
-        _friendView.Show();
-    }
-    public void LoadFriends(string[] friends)
-    {
-        for (int i = _friendHolder.childCount - 1; i >= 0; i--)
-            Destroy(_friendHolder.GetChild(i).gameObject);
-
-        for (int i = 0; i < friends.Length; i++)
-        {
-            Button but = Instantiate(_prefabFriendButton, _friendHolder);
-            but.name = friends[i];
-            but.GetComponentInChildren<TMP_Text>().text = friends[i];
-            but.onClick.AddListener(() => JoinFriend(but.name));
-        }
-    }
-    public void JoinFriend(string name)
-    {
-        _gameManager.PlayerState = PlayerState.Remote;
-    }
-    public void AddFriend()
-    {
-    }
-    void HideFriends()
-    {
-        _friendView.Hide();
-    }
-    public void LocalGame()
-    {
-        _gameManager.PlayerState = PlayerState.Local;
-    }
-    public void HostGame()
-    {
-        _gameManager.PlayerState = PlayerState.Host;
+        //close and save stuff i guess
     }
     public void Quit()
     {
         Application.Quit();
-#if UNITY_EDITOR
-        UnityEditor.EditorApplication.isPlaying = false;
-#endif
     }
+    #endregion
+    #region Setup
+    public void BackToMain()
+    {
+        _setupView.Hide();
+        _mainView.Show();
+    }
+    public void ToggleMapView()
+    {
+        if (_mapView.gameObject.activeInHierarchy)
+        {
+            _mapView.Hide();
+            _setupView.Show();
+        }
+        else
+        {
+            _setupView.Hide();
+            _mapView.Show();
+        }
+    }
+    public void RegenerateIsland()
+    {
+        _islandManager.GenerateIsland();
+    }
+    public void StartGame()
+    {
+        _gameManager.Units = Units.CurrentValue;
+        _gameManager.Moves = Moves.CurrentValue;
+        _gameManager.Specials = Specials.CurrentValue;
+        _gameManager.PickupFreq = Pickup.CurrentValue;
+
+        _gameManager.Barrels = Barrels.CurrentValue;
+        _gameManager.Mines = Mines.CurrentValue;
+        _gameManager.Healthpacks = Healthpacks.CurrentValue;
+
+        _setupView.Hide();
+        _gameManager.StartGame();
+        _hudView.Show();
+    }
+    #endregion
+
 }

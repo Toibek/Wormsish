@@ -5,7 +5,8 @@ using UnityEngine;
 [RequireComponent(typeof(RectTransform), typeof(CanvasGroup))]
 public class View : MonoBehaviour
 {
-    public Transition Transition = Transition.Move;
+    public StartBehaviour OnStart = StartBehaviour.Hide;
+    public TransitionType Transition = TransitionType.Move;
     public Direction MoveDirection = Direction.Up;
     public Vector3 ShowPosition;
     public Vector3 CustomHidePosition;
@@ -19,6 +20,23 @@ public class View : MonoBehaviour
     {
         _cg = GetComponent<CanvasGroup>();
         _rect = GetComponent<RectTransform>();
+        switch (OnStart)
+        {
+            case StartBehaviour.Show:
+                _rect.anchoredPosition = ShowPosition;
+                break;
+            case StartBehaviour.ShowAnimation:
+                Show();
+                break;
+            case StartBehaviour.Hide:
+                gameObject.SetActive(false);
+                break;
+        }
+    }
+    public void ToggleView()
+    {
+        if (gameObject.activeInHierarchy) Hide();
+        else Show();
     }
     public void Show()
     {
@@ -29,10 +47,10 @@ public class View : MonoBehaviour
             _rect = GetComponent<RectTransform>();
             switch (Transition)
             {
-                case Transition.Fade:
+                case TransitionType.Fade:
                     _activeRoutine = StartCoroutine(ShowFadeRoutine());
                     break;
-                case Transition.Move:
+                case TransitionType.Move:
                     _activeRoutine = StartCoroutine(ShowMoveRoutine());
                     break;
             }
@@ -68,10 +86,10 @@ public class View : MonoBehaviour
             float t = f / AnimationTime;
             float dis = Vector3.Distance(origin, target);
             Vector3 pos = Vector3.MoveTowards(origin, target, dis * Curve.Evaluate(t));
-            _rect.localPosition = pos;
+            _rect.anchoredPosition = pos;
             yield return new WaitForEndOfFrame();
         }
-        _rect.localPosition = target;
+        _rect.anchoredPosition = target;
         _activeRoutine = null;
     }
     IEnumerator ShowFadeRoutine()
@@ -95,10 +113,10 @@ public class View : MonoBehaviour
             _rect = GetComponent<RectTransform>();
             switch (Transition)
             {
-                case Transition.Fade:
+                case TransitionType.Fade:
                     _activeRoutine = StartCoroutine(HideFadeRoutine());
                     break;
-                case Transition.Move:
+                case TransitionType.Move:
                     _activeRoutine = StartCoroutine(HideMoveRoutine());
                     break;
             }
@@ -110,22 +128,22 @@ public class View : MonoBehaviour
         switch (MoveDirection)
         {
             case Direction.Right:
-                target = Screen.width * Vector3.right;
+                target = 2 * Screen.width * Vector3.right;
                 break;
             case Direction.Left:
-                target = Screen.width * Vector3.left;
+                target = 2 * Screen.width * Vector3.left;
                 break;
             case Direction.Up:
-                target = Screen.height * Vector3.up;
+                target = 2 * Screen.height * Vector3.up;
                 break;
             case Direction.Down:
-                target = Screen.height * Vector3.down;
+                target = 2 * Screen.height * Vector3.down;
                 break;
             case Direction.Custom:
                 target = CustomHidePosition;
                 break;
             default:
-                target = Screen.height * Vector3.up;
+                target = 2 * Screen.height * Vector3.up;
                 break;
         }
         Vector3 origin = ShowPosition;
@@ -134,7 +152,7 @@ public class View : MonoBehaviour
             float t = f / AnimationTime;
             float dis = Vector3.Distance(origin, target);
             Vector3 pos = Vector3.MoveTowards(origin, target, dis * Curve.Evaluate(t));
-            _rect.localPosition = pos;
+            _rect.anchoredPosition = pos;
             yield return new WaitForEndOfFrame();
         }
         gameObject.SetActive(false);
@@ -152,6 +170,7 @@ public class View : MonoBehaviour
         gameObject.SetActive(false);
         _activeRoutine = null;
     }
+    public enum TransitionType { Fade, Move }
+    public enum Direction { Right, Left, Up, Down, Custom }
+    public enum StartBehaviour { Show, ShowAnimation, Hide }
 }
-public enum Transition { Fade, Move }
-public enum Direction { Right, Left, Up, Down, Custom }

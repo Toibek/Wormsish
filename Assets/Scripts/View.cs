@@ -95,6 +95,7 @@ public class View : MonoBehaviour
     IEnumerator ShowFadeRoutine()
     {
         gameObject.SetActive(true);
+        _rect.anchoredPosition = ShowPosition;
         for (float f = 0; f < AnimationTime; f += Time.deltaTime)
         {
             float t = f / AnimationTime;

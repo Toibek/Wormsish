@@ -13,23 +13,24 @@ public class PlayerManager : MonoBehaviour
     [Space]
     [SerializeField] private GameObject _unitPrefab;
     [SerializeField] private Material _unitMaterial;
-    [SerializeField] private ObjectManager _objectGen;
     [SerializeField] private CinemachineVirtualCamera _followCam;
-    [SerializeField] private CinemachineOrbitalTransposer _followOrbital;
     [Space]
     [SerializeField] private Transform _movesHolder;
     [SerializeField] private Transform _specialsHolder;
 
+    private CinemachineOrbitalTransposer _followOrbital;
     private Unit _activeUnit;
     private Vector2Int _activePlace;
 
     private int _currentMoves;
     private int _currentSpecials;
 
+    private GameManager _gameManager;
     private InputHandler _inputHandler;
     private void Start()
     {
-        //_followOrbital = _followCam.GetCinemachineComponent<CinemachineOrbitalTransposer>();
+        _gameManager = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameManager>();
+        _followOrbital = _followCam.GetCinemachineComponent<CinemachineOrbitalTransposer>();
         _inputHandler = GetComponent<InputHandler>();
     }
     private void MoveUnit(Vector2 moveDirection)
@@ -107,37 +108,24 @@ public class PlayerManager : MonoBehaviour
     }
     public IEnumerator SpawnPlayers()
     {
-        List<GameObject> spawnPoints = new List<GameObject>();
-        spawnPoints.AddRange(GameObject.FindGameObjectsWithTag("Respawn"));
         int n = Teams.Count * TeamSize;
-        if (spawnPoints.Count < n)
-        {
-            Debug.Log("Asking for more respawn points");
-            spawnPoints.AddRange(_objectGen.More("Spawner", n - spawnPoints.Count));
-        }
-
         for (int team = 0; team < Teams.Count; team++)
         {
             Teams[team].Active = true;
             Material mat = new(_unitMaterial);
-            mat.color = Teams[team].color;
+            mat.color = Teams[team].Color;
             for (int unit = 0; unit < TeamSize; unit++)
             {
-                int r = Random.Range(0, spawnPoints.Count);
-                GameObject go = Instantiate(_unitPrefab, spawnPoints[r].transform.position, Quaternion.identity, transform);
+                Ray ray = new(_gameManager.ValidPosition + Vector3.up * 50, Vector2.down);
+                Physics.Raycast(ray, out var hit);
+                GameObject go = Instantiate(_unitPrefab, hit.point + new Vector3(0, 0.5f, 0), Quaternion.identity, transform);
                 go.GetComponentInChildren<MeshRenderer>().material = mat;
-                Destroy(spawnPoints[r]);
-                spawnPoints.RemoveAt(r);
                 Unit u = go.GetComponent<Unit>();
                 u.PlayerManager = this;
                 Teams[team].Units.Add(u);
+
                 yield return new WaitForEndOfFrame();
             }
-        }
-        for (int i = spawnPoints.Count - 1; i >= 0; i--)
-        {
-            Destroy(spawnPoints[i]);
-            spawnPoints.RemoveAt(i);
         }
         SetActivePlayer(new(0, 0));
 
@@ -200,8 +188,14 @@ public class PlayerManager : MonoBehaviour
 [System.Serializable]
 public class Team : object
 {
+    public Team(string name, Color color)
+    {
+        Name = name;
+        Color = color;
+        Units = new List<Unit>();
+    }
     public bool Active;
     public string Name;
-    public Color color;
+    public Color Color;
     public List<Unit> Units;
 }

@@ -6,7 +6,11 @@ using TMPro;
 
 public class UpDownValue : MonoBehaviour
 {
-    public string ValueName;
+    public string ValueName
+    {
+        get { return _titleText.text; }
+        set { _titleText.text = value; }
+    }
     public int Increments;
     public int CurrentValue
     {
@@ -22,7 +26,7 @@ public class UpDownValue : MonoBehaviour
     private Button _leftButton;
     private Button _rightButton;
     private TMP_Text _valueText;
-    private void Start()
+    private void Awake()
     {
         TMP_Text[] texts = transform.GetComponentsInChildren<TMP_Text>();
         _titleText = texts[0];
@@ -30,7 +34,9 @@ public class UpDownValue : MonoBehaviour
         Button[] buttons = transform.GetComponentsInChildren<Button>();
         _leftButton = buttons[0];
         _rightButton = buttons[1];
-
+    }
+    private void Start()
+    {
         _titleText.text = ValueName;
         _valueText.text = CurrentValue.ToString();
         _leftButton.onClick.AddListener(Decrease);

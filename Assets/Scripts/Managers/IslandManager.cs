@@ -54,6 +54,11 @@ public class IslandManager : MonoBehaviour
         _activeMap = null;
         _activeMapObjects = null;
     }
+    public void GenerateIfEmpty()
+    {
+        if (_activeMap == null)
+            GenerateIsland();
+    }
     /// <summary>
     /// A function to create the base level.
     /// </summary>

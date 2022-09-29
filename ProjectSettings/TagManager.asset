@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Island
   - Objects
+  - PlayerManager
   layers:
   - Default
   - TransparentFX

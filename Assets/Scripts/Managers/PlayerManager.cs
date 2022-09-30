@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using Cinemachine;
+using TMPro;
 
 public class PlayerManager : MonoBehaviour
 {
@@ -17,6 +18,7 @@ public class PlayerManager : MonoBehaviour
     [Space]
     [SerializeField] private Transform _movesHolder;
     [SerializeField] private Transform _specialsHolder;
+    [SerializeField] private Transform _teamNamesHolder;
 
     private CinemachineOrbitalTransposer _followOrbital;
     private Unit _activeUnit;
@@ -27,6 +29,7 @@ public class PlayerManager : MonoBehaviour
 
     private GameManager _gameManager;
     private InputHandler _inputHandler;
+
     private void Start()
     {
         _gameManager = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameManager>();
@@ -39,9 +42,8 @@ public class PlayerManager : MonoBehaviour
         {
             if (--_currentMoves == 0 && _currentSpecials == 0)
             {
-                Invoke(nameof(ChangeUnit), 1);
+                _gameManager.EndOfTurn();
             }
-
             UpdateUiChildren(_specialsHolder, _currentSpecials, 0);
             UpdateUiChildren(_movesHolder, _currentMoves, 0);
         }
@@ -94,6 +96,31 @@ public class PlayerManager : MonoBehaviour
     {
         for (int i = 0; i < uiToReset.childCount; i++)
             uiToReset.GetChild(i).GetChild(childToEnable).gameObject.SetActive(i < amountToEnable);
+    }
+    private void UpdateTeamorder()
+    {
+        List<string> teamsInOrder = new();
+        List<string> before = new();
+        for (int i = 0; i < Teams.Count; i++)
+        {
+            if (teamsInOrder.Count == 0 && Teams[i].Active)
+                teamsInOrder.Add(Teams[i].Name);
+            else if (teamsInOrder.Count == 0)
+                before.Add(Teams[i].Name);
+            else
+                teamsInOrder.Add(Teams[i].Name);
+        }
+        TMP_Text[] texts = _teamNamesHolder.GetComponentsInChildren<TMPro.TMP_Text>();
+        for (int i = 0; i < texts.Length; i++)
+        {
+            if (teamsInOrder.Count > i)
+            {
+                texts[i].gameObject.SetActive(true);
+                texts[i].text = teamsInOrder[i];
+            }
+            else
+                texts[i].gameObject.SetActive(false);
+        }
     }
     void SetActivePlayer(Vector2Int player)
     {
@@ -185,6 +212,8 @@ public class PlayerManager : MonoBehaviour
         Debug.Log(team.Name + " is the winner!");
     }
 }
+
+
 [System.Serializable]
 public class Team : object
 {

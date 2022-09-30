@@ -7,9 +7,13 @@ public class GameManager : MonoBehaviour
 {
     public int MaxPlayers = 8;
     public int MinPlayers = 2;
-
+    [Space]
+    public int AirdropHeight = 10;
+    [Space]
     public SpawnableObject[] Spawnables;
     public SpawnableObject[] Pickups;
+
+    [SerializeField] GameObject airdropPrefab;
 
     internal IslandManager IslandGen;
     internal ObjectManager ObjectGen;
@@ -18,13 +22,30 @@ public class GameManager : MonoBehaviour
     internal int Units;
     internal int Moves;
     internal int Specials;
-    internal int PickupFreq;
-
-    internal int Barrels;
-    internal int Mines;
-    internal int Healthpacks;
+    internal int PickupPerTurn;
 
 
+    public GameObject Airdrop
+    {
+        get
+        {
+            if (pooledAirdrops == null) pooledAirdrops = new();
+            if (pooledAirdrops.Count > 0)
+            {
+                GameObject go = pooledAirdrops[0];
+                pooledAirdrops.Remove(go);
+                return go;
+            }
+            return Instantiate(airdropPrefab);
+        }
+        set
+        {
+            value.SetActive(false);
+            if (pooledAirdrops == null) pooledAirdrops = new();
+            pooledAirdrops.Add(value);
+        }
+    }
+    List<GameObject> pooledAirdrops;
     public Vector3 ValidPosition
     {
         get
@@ -68,6 +89,26 @@ public class GameManager : MonoBehaviour
         PlayerManager.Moves = Moves;
         PlayerManager.Specials = Specials;
         StartCoroutine(PlayerManager.SpawnPlayers());
+    }
+    public void EndOfTurn()
+    {
+        for (int i = 0; i < PickupPerTurn; i++)
+        {
+            Vector3 pos = ValidPosition;
+            Airdrop.transform.position = pos + (Vector3.up * AirdropHeight);
+        }
+    }
+    public void StartOfTurn()
+    {
+
+    }
+    public void EndOfTeam()
+    {
+
+    }
+    public void StartOfTeam()
+    {
+
     }
 }
 [System.Serializable]

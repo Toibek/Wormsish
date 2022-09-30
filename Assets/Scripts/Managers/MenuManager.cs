@@ -129,7 +129,7 @@ public class MenuManager : MonoBehaviour
         _gameManager.Units = _units.CurrentValue;
         _gameManager.Moves = _moves.CurrentValue;
         _gameManager.Specials = _specials.CurrentValue;
-        _gameManager.PickupFreq = _pickup.CurrentValue;
+        _gameManager.PickupPerTurn = _pickup.CurrentValue;
         for (int i = 0; i < Objects.Count; i++)
             _gameManager.ObjectGen.SpawnOnGround(_gameManager.Spawnables[i], Objects[i].CurrentValue);
         for (int i = 0; i < _playerSettings.Count; i++)

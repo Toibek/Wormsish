@@ -88,25 +88,12 @@ public class GameManager : MonoBehaviour
         PlayerManager.Specials = Specials;
         StartCoroutine(PlayerManager.SpawnPlayers());
     }
-    public void EndOfTurn()
+    public void SpawnAirdrops()
     {
         for (int i = 0; i < PickupPerTurn; i++)
         {
-            Vector3 pos = ValidPosition;
-            Airdrop.transform.position = pos + (Vector3.up * AirdropHeight);
+            Airdrop.transform.position = ValidPosition + (Vector3.up * AirdropHeight);
         }
-    }
-    public void StartOfTurn()
-    {
-
-    }
-    public void EndOfTeam()
-    {
-
-    }
-    public void StartOfTeam()
-    {
-
     }
     public void GameOver(Team winningTeam)
     {

@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Movement : MonoBehaviour
+public class UnitMovement : MonoBehaviour
 {
     internal Unit Unit;
     internal Transform CamTransform;

@@ -19,6 +19,7 @@ public class PlayerManager : MonoBehaviour
     [SerializeField] private Transform _movesHolder;
     [SerializeField] private Transform _specialsHolder;
     [SerializeField] private Transform _teamNamesHolder;
+    [SerializeField] private GameObject pressSpace;
 
     private TMP_Text[] teamNames;
     private CinemachineOrbitalTransposer _followOrbital;
@@ -29,6 +30,7 @@ public class PlayerManager : MonoBehaviour
 
     private GameManager _gameManager;
     private InputHandler _inputHandler;
+    private bool _teamChange;
 
     private void Start()
     {
@@ -38,11 +40,12 @@ public class PlayerManager : MonoBehaviour
     }
     private void MoveUnit(Vector2 moveDirection)
     {
+        if (_teamChange) return;
         if (_currentMoves > 0 && _activeUnit.Movement.Move(moveDirection))
         {
             if (--_currentMoves == 0 && _currentSpecials == 0)
             {
-                _gameManager.EndOfTurn();
+                _gameManager.SpawnAirdrops();
             }
             UpdateUiChildren(_specialsHolder, _currentSpecials, 0);
             UpdateUiChildren(_movesHolder, _currentMoves, 0);
@@ -50,12 +53,21 @@ public class PlayerManager : MonoBehaviour
     }
     public void Rotation(Vector2 rotation)
     {
+        if (_teamChange) return;
         _followOrbital.m_XAxis.Value = rotation.x * 0.2f;
         _activeUnit.Movement.Rotation();
     }
     private void ToggleOverview()
     {
+        if (_teamChange) return;
         _followCam.Priority *= -1;
+    }
+    public void SkipTurn()
+    {
+        if (_teamChange)
+            StartNewTeam();
+        else
+            ChangeUnit();
     }
     public void ChangeUnit()
     {
@@ -82,16 +94,28 @@ public class PlayerManager : MonoBehaviour
                     }
                 }
             if (avaliableTeam != -1)
+            {
+                UpdateTeamorder();
+                _followCam.Priority = -1;
+                _teamChange = true;
+                pressSpace.SetActive(true);
                 _activePlace = new(avaliableTeam, 0);
+            }
             else _activePlace = new(_activePlace.x, 0);
-            UpdateTeamorder();
         }
         else
             _activePlace += new Vector2Int(0, 1);
-        SetActivePlayer(_activePlace);
+        _gameManager.SpawnAirdrops();
 
+        SetActivePlayer(_activePlace);
         UpdateUiChildren(_specialsHolder, _currentSpecials, 0);
         UpdateUiChildren(_movesHolder, _currentMoves, 0);
+    }
+    private void StartNewTeam()
+    {
+        _followCam.Priority = 1;
+        pressSpace.SetActive(false);
+        _teamChange = false;
     }
     private void UpdateUiChildren(Transform uiToReset, int amountToEnable, int childToEnable)
     {
@@ -157,7 +181,7 @@ public class PlayerManager : MonoBehaviour
 
         _inputHandler.OnMovementStay = MoveUnit;
         _inputHandler.OnRotationStay = Rotation;
-        _inputHandler.OnPassTurn = ChangeUnit;
+        _inputHandler.OnPassTurn = SkipTurn;
         _inputHandler.OnShowMap = ToggleOverview;
 
         DuplicateFirstChild(_specialsHolder, Specials);
@@ -166,7 +190,8 @@ public class PlayerManager : MonoBehaviour
         DuplicateFirstChild(_movesHolder, Moves);
         _movesHolder.gameObject.SetActive(true);
 
-        _followCam.m_Priority = 1;
+        pressSpace.SetActive(true);
+        _teamChange = true;
 
         UpdateTeamorder();
     }

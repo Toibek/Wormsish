@@ -18,6 +18,7 @@ public class GameManager : MonoBehaviour
     internal IslandManager IslandGen;
     internal ObjectManager ObjectGen;
     internal PlayerManager PlayerManager;
+    internal MenuManager MenuManager;
 
     internal int Units;
     internal int Moves;
@@ -74,10 +75,7 @@ public class GameManager : MonoBehaviour
         IslandGen = GameObject.FindGameObjectWithTag("Island").GetComponent<IslandManager>();
         ObjectGen = GameObject.FindGameObjectWithTag("Objects").GetComponent<ObjectManager>();
         PlayerManager = GameObject.FindGameObjectWithTag("PlayerManager").GetComponent<PlayerManager>();
-    }
-    public void LoadIntoGame()
-    {
-        SceneManager.LoadScene(1);
+        MenuManager = GameObject.FindGameObjectWithTag("Canvas").GetComponent<MenuManager>();
     }
     public void SetTeam(string name, Color color)
     {
@@ -109,6 +107,11 @@ public class GameManager : MonoBehaviour
     public void StartOfTeam()
     {
 
+    }
+    public void GameOver(Team winningTeam)
+    {
+        ObjectGen.ClearObjects();
+        MenuManager.GameOver(winningTeam);
     }
 }
 [System.Serializable]

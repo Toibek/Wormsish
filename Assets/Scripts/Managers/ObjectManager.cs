@@ -28,6 +28,7 @@ public class ObjectManager : MonoBehaviour
                 GameObject go = obj.GetObject(hit.point + Vector3.up * 0.5f, transform);
                 go.GetComponent<DamageableObject>().ObjectManager = this;
                 go.name = obj.Name;
+                _activeObjects.Add(go);
             }
         }
     }
@@ -37,6 +38,8 @@ public class ObjectManager : MonoBehaviour
         {
             GameObject go = obj.GetObject(_gameManager.ValidPosition + Vector3.up * AirDropPosition, transform);
             go.GetComponent<DamageableObject>().ObjectManager = this;
+            go.name = obj.Name;
+            _activeObjects.Add(go);
         }
     }
     public void Decomission(GameObject go)

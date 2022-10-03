@@ -20,10 +20,10 @@ public class PlayerManager : MonoBehaviour
     [SerializeField] private Transform _specialsHolder;
     [SerializeField] private Transform _teamNamesHolder;
 
+    private TMP_Text[] teamNames;
     private CinemachineOrbitalTransposer _followOrbital;
     private Unit _activeUnit;
     private Vector2Int _activePlace;
-
     private int _currentMoves;
     private int _currentSpecials;
 
@@ -84,6 +84,7 @@ public class PlayerManager : MonoBehaviour
             if (avaliableTeam != -1)
                 _activePlace = new(avaliableTeam, 0);
             else _activePlace = new(_activePlace.x, 0);
+            UpdateTeamorder();
         }
         else
             _activePlace += new Vector2Int(0, 1);
@@ -99,30 +100,28 @@ public class PlayerManager : MonoBehaviour
     }
     private void UpdateTeamorder()
     {
-        List<string> teamsInOrder = new();
-        List<string> before = new();
-        for (int i = 0; i < Teams.Count; i++)
+        if (teamNames == null || teamNames.Length == 0)
         {
-            if (teamsInOrder.Count == 0 && Teams[i].Active)
-                teamsInOrder.Add(Teams[i].Name);
-            else if (teamsInOrder.Count == 0)
-                before.Add(Teams[i].Name);
-            else
-                teamsInOrder.Add(Teams[i].Name);
+            teamNames = _teamNamesHolder.GetComponentsInChildren<TMP_Text>();
         }
-        TMP_Text[] texts = _teamNamesHolder.GetComponentsInChildren<TMPro.TMP_Text>();
-        for (int i = 0; i < texts.Length; i++)
+        List<string> teamsInOrder = new();
+        for (int i = _activePlace.x; i < Teams.Count; i++)
+            if (Teams[i].Active) teamsInOrder.Add(Teams[i].Name);
+        for (int i = 0; i < _activePlace.x; i++)
+            if (Teams[i].Active) teamsInOrder.Add(Teams[i].Name);
+
+        for (int i = 0; i < teamNames.Length; i++)
         {
             if (teamsInOrder.Count > i)
             {
-                texts[i].gameObject.SetActive(true);
-                texts[i].text = teamsInOrder[i];
+                teamNames[i].transform.parent.gameObject.SetActive(true);
+                teamNames[i].text = teamsInOrder[i];
             }
             else
-                texts[i].gameObject.SetActive(false);
+                teamNames[i].transform.parent.gameObject.SetActive(false);
         }
     }
-    void SetActivePlayer(Vector2Int player)
+    private void SetActivePlayer(Vector2Int player)
     {
         _activeUnit = Teams[player.x].Units[player.y];
         _activePlace = new(player.x, player.y);
@@ -168,11 +167,13 @@ public class PlayerManager : MonoBehaviour
         _movesHolder.gameObject.SetActive(true);
 
         _followCam.m_Priority = 1;
+
+        UpdateTeamorder();
     }
     private void DuplicateFirstChild(Transform content, int amount)
     {
         GameObject uiRef = content.GetChild(0).gameObject;
-        for (int i = 1; i < amount; i++)
+        for (int i = content.childCount; i < amount; i++)
             Instantiate(uiRef, content);
     }
     public void ReportUnitDeath(Unit unit)
@@ -189,7 +190,6 @@ public class PlayerManager : MonoBehaviour
                     Teams[i].Active = false;
                     Team t = CheckForWinner();
                     if (t != null) DeclareWinner(t);
-
                 }
                 break;
             }
@@ -209,7 +209,23 @@ public class PlayerManager : MonoBehaviour
     }
     private void DeclareWinner(Team team)
     {
-        Debug.Log(team.Name + " is the winner!");
+        for (int t = Teams.Count - 1; t >= 0; t--)
+        {
+            for (int u = Teams[t].Units.Count - 1; u >= 0; u--)
+            {
+                Destroy(Teams[t].Units[u].gameObject);
+                Teams[t].Units.RemoveAt(u);
+            }
+        }
+        Teams = new List<Team>();
+        _activePlace = new(0, 0);
+        _inputHandler.OnMovementStay = null;
+        _inputHandler.OnRotationStay = null;
+        _inputHandler.OnPassTurn = null;
+        _inputHandler.OnShowMap = null;
+        _followCam.Priority = -1;
+
+        _gameManager.GameOver(team);
     }
 }
 

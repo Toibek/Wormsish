@@ -27,7 +27,9 @@ public class MenuManager : MonoBehaviour
     [SerializeField] private View _hudView;
     [Header("Settings")]
     [SerializeField] private View _settingsView;
-
+    [Header("GameOver")]
+    [SerializeField] private View _gameOverView;
+    [SerializeField] private TMP_Text WinnerText;
     private GameManager _gameManager;
     private string[] _randomNameArray;
 
@@ -79,7 +81,7 @@ public class MenuManager : MonoBehaviour
     #endregion
 
     #region Setup
-    public void BackToMain()
+    public void BackFromSetup()
     {
         _setupView.Hide();
         _mainView.Show();
@@ -140,4 +142,21 @@ public class MenuManager : MonoBehaviour
     }
     #endregion
 
+    #region GameOver
+
+    public void GameOver(Team winner)
+    {
+        _hudView.Hide();
+        _gameOverView.Show();
+        WinnerText.text = winner.Name;
+        WinnerText.color = winner.Color;
+    }
+
+    public void BackFromGameOver()
+    {
+        _gameOverView.Hide();
+        _mainView.Show();
+    }
+
+    #endregion
 }

@@ -13,6 +13,7 @@ public class Airdrop : MonoBehaviour
     private void OnCollisionEnter(Collision collision)
     {
         _gameManager = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameManager>();
+        Drop = _gameManager.RandomPickup;
         _crate = transform.GetChild(0);
         StartCoroutine(OpenPackage());
     }

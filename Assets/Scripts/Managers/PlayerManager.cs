@@ -55,7 +55,6 @@ public class PlayerManager : MonoBehaviour
     {
         if (_teamChange) return;
         _followOrbital.m_XAxis.Value = rotation.x * 0.2f;
-        _activeUnit.Movement.Rotation();
     }
     private void ToggleOverview()
     {
@@ -71,7 +70,7 @@ public class PlayerManager : MonoBehaviour
     }
     public void ChangeUnit()
     {
-        _activeUnit.transform.GetChild(1).gameObject.SetActive(false);
+        _activeUnit.Active = false;
         if (_activePlace.y + 1 >= Teams[_activePlace.x].Units.Count)
         {
             int avaliableTeam = -1;
@@ -145,16 +144,21 @@ public class PlayerManager : MonoBehaviour
                 teamNames[i].transform.parent.gameObject.SetActive(false);
         }
     }
+    public void DisplayForce(float f)
+    {
+        f = Mathf.Clamp01(f);
+
+    }
     private void SetActivePlayer(Vector2Int player)
     {
         _activeUnit = Teams[player.x].Units[player.y];
         _activePlace = new(player.x, player.y);
-        _activeUnit.transform.GetChild(1).gameObject.SetActive(true);
         _followCam.LookAt = _activeUnit.transform;
         _followCam.Follow = _activeUnit.transform;
-        _activeUnit.Movement.CamTransform = _followCam.transform;
+        _activeUnit.Camera = _followCam.transform;
         _currentMoves = Moves;
         _currentSpecials = Specials;
+        _activeUnit.Active = true;
     }
     public IEnumerator SpawnPlayers()
     {

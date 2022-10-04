@@ -23,7 +23,7 @@ public class Mine : MonoBehaviour
     }
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Player") && _activeRoutine == null)
+        if (other.CompareTag("Player") && other.GetComponent<Unit>().Active && _activeRoutine == null)
         {
             _activeRoutine = StartCoroutine(Triggered());
         }

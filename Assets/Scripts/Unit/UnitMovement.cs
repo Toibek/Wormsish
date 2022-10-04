@@ -5,7 +5,6 @@ using UnityEngine;
 public class UnitMovement : MonoBehaviour
 {
     internal Unit Unit;
-    internal Transform CamTransform;
 
     [SerializeField] LayerMask _layerMask;
     [SerializeField] int _jumpHeight;
@@ -25,11 +24,11 @@ public class UnitMovement : MonoBehaviour
         if (_moveRoutine == null)
         {
             Vector3 movement = Vector3.zero;
-            Vector3 forward = transform.forward;
+            Vector3 forward = transform.position - Unit.Camera.position;
             forward.y = 0;
             movement += forward * direction.y;
 
-            Vector3 right = transform.right;
+            Vector3 right = new(forward.z, forward.y, -forward.x);
             right.y = 0;
             movement += right * direction.x;
             movement.Normalize();
@@ -56,15 +55,12 @@ public class UnitMovement : MonoBehaviour
     /// <summary>
     /// Update the rotation of the unit relative to the camera
     /// </summary>
-    public void Rotation()
+    public void Rotation(float rot)
     {
-        Vector3 dif = (transform.position - CamTransform.position).normalized;
-        float rot = Mathf.Atan2(dif.x, dif.z) * Mathf.Rad2Deg;
-        rot = Mathf.Round(rot / 45) * 45;
         transform.rotation = Quaternion.Euler(0, rot, 0);
     }
     /// <summary>
-    /// run movement between start and end position through a brazier curve
+    /// run movement between start and end position through a Bézier curve
     /// </summary>
     /// <param name="startPosition">the origin of the object</param>
     /// <param name="endPosition">the final position</param>

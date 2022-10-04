@@ -58,8 +58,8 @@ Rigidbody:
   m_GameObject: {fileID: 7020285177950449057}
   serializedVersion: 2
   m_Mass: 1
-  m_Drag: 20
-  m_AngularDrag: 20
+  m_Drag: 2
+  m_AngularDrag: 2
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0
@@ -77,7 +77,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a31bf354397da446a2e43ba634b16f5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  AnimationTime: 0
+  AnimationTime: 1
   ConfettiPrefab: {fileID: 0}
 --- !u!1001 &7020285177578385551
 PrefabInstance:
@@ -220,6 +220,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 432ff85ba5335c64cb7907305342eda6, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: e8c7efa706e52f844864bd58ddd137d4, type: 2}
     - target: {fileID: 919132149155446097, guid: 432ff85ba5335c64cb7907305342eda6, type: 3}
       propertyPath: m_Name
       value: Parachute

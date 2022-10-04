@@ -75,6 +75,9 @@ public class IslandManager : MonoBehaviour
         if (_activeMapObjects != null)
             ClearMap();
 
+        float r = Random.Range(0, 100f);
+        _botMaterial.SetFloat("_RandomThing", r);
+        _topMaterial.SetFloat("_RandomThing", r);
 
         _activeMap = Cellular.GenerateArray(seed, Layers, Size, NoiseDensity, Neighbors, _baseIterations, _taperingIterations);
         _activeMapObjects = new GameObject[_activeMap.GetLength(0), _activeMap.GetLength(1), _activeMap.GetLength(2)];

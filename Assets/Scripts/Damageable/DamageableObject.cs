@@ -4,9 +4,9 @@ using UnityEngine;
 
 public class DamageableObject : Damageable
 {
-    internal ObjectManager ObjectManager;
+    internal SpawnableObject ReturnTo;
     public override void LethalDamage()
     {
-        ObjectManager.Decomission(gameObject);
+        ReturnTo.DeactivateObject(gameObject);
     }
 }

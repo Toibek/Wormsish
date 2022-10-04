@@ -11,6 +11,8 @@ public class InputHandler : MonoBehaviour
     public VectorDelegate OnRotationStay;
     public EmptyDelegate OnPassTurn;
     public EmptyDelegate OnShowMap;
+    public EmptyDelegate OnShootStart;
+    public EmptyDelegate OnShootEnd;
 
 
     public delegate void EmptyDelegate();
@@ -52,7 +54,8 @@ public class InputHandler : MonoBehaviour
     }
     public void Primary(InputAction.CallbackContext context)
     {
-
+        if (context.started) OnShootStart?.Invoke();
+        if (context.canceled) OnShootEnd?.Invoke();
     }
     public void Secondary(InputAction.CallbackContext context)
     {

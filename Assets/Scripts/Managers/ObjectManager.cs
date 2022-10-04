@@ -16,7 +16,7 @@ public class ObjectManager : MonoBehaviour
     public void ClearObjects()
     {
         for (int i = _activeObjects.Count - 1; i >= 0; i--)
-            Decomission(_activeObjects[i]);
+            _activeObjects[i].GetComponent<DamageableObject>().LethalDamage();
     }
     public void SpawnOnGround(SpawnableObject obj, int amount = 1)
     {
@@ -26,35 +26,34 @@ public class ObjectManager : MonoBehaviour
             if (Physics.Raycast(ray, out var hit))
             {
                 GameObject go = obj.GetObject(hit.point + Vector3.up * 0.5f, transform);
-                go.GetComponent<DamageableObject>().ObjectManager = this;
                 go.name = obj.Name;
                 _activeObjects.Add(go);
             }
         }
     }
-    public void SpawnInAir(SpawnableObject obj, int amount = 1)
-    {
-        for (int i = 0; i < amount; i++)
-        {
-            GameObject go = obj.GetObject(_gameManager.ValidPosition + Vector3.up * AirDropPosition, transform);
-            go.GetComponent<DamageableObject>().ObjectManager = this;
-            go.name = obj.Name;
-            _activeObjects.Add(go);
-        }
-    }
-    public void Decomission(GameObject go)
-    {
-        _activeObjects.Remove(go);
-        SpawnableObject obj = new();
-        for (int i = 0; i < _gameManager.Spawnables.Length; i++)
-        {
-            if (go.name == _gameManager.Spawnables[i].Name)
-            {
-                obj = _gameManager.Spawnables[i];
-                break;
-            }
-        }
-        obj.DeactivateObject(go);
-        if (string.IsNullOrEmpty(obj.Name)) Debug.LogWarning("Unexpected object trying to pool");
-    }
+    //public void SpawnInAir(SpawnableObject obj, int amount = 1)
+    //{
+    //    for (int i = 0; i < amount; i++)
+    //    {
+    //        GameObject go = obj.GetObject(_gameManager.ValidPosition + Vector3.up * AirDropPosition, transform);
+    //        go.GetComponent<DamageableObject>().ReturnTo = obj;
+    //        go.name = obj.Name;
+    //        _activeObjects.Add(go);
+    //    }
+    //}
+    //public void Decomission(GameObject go)
+    //{
+    //    _activeObjects.Remove(go);
+    //    SpawnableObject obj = new();
+    //    for (int i = 0; i < _gameManager.Spawnables.Length; i++)
+    //    {
+    //        if (go.name == _gameManager.Spawnables[i].Name)
+    //        {
+    //            obj = _gameManager.Spawnables[i];
+    //            break;
+    //        }
+    //    }
+    //    obj.DeactivateObject(go);
+    //    if (string.IsNullOrEmpty(obj.Name)) Debug.LogWarning("Unexpected object trying to pool");
+    //}
 }

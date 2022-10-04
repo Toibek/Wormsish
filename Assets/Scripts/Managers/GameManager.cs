@@ -25,7 +25,16 @@ public class GameManager : MonoBehaviour
     internal int Specials;
     internal int PickupPerTurn;
 
-
+    public GameObject RandomPickup
+    {
+        get
+        {
+            SpawnableObject spawnable = Pickups[Random.Range(0, Pickups.Length)];
+            GameObject go = spawnable.GetObject(new(0, 0, 0), ObjectGen.transform);
+            go.SetActive(false);
+            return go;
+        }
+    }
     public GameObject Airdrop
     {
         get
@@ -117,11 +126,16 @@ public class SpawnableObject : object
             go.transform.position = position;
             go.transform.SetParent(parent);
             InactiveObjects.Remove(go);
+            go.GetComponent<DamageableObject>().ReturnTo = this;
             go.SetActive(true);
             return go;
         }
         else
-            return GameObject.Instantiate(Prefab, position, Quaternion.identity, parent);
+        {
+            GameObject go = GameObject.Instantiate(Prefab, position, Quaternion.identity, parent);
+            go.GetComponent<DamageableObject>().ReturnTo = this;
+            return go;
+        }
 
     }
     public void DeactivateObject(GameObject go)

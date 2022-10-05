@@ -20,7 +20,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Shader Graphs_Bubble
+  m_Name: Bubble
   m_Shader: {fileID: -6465566751694194690, guid: b555dd1956340024695831d17c8ecf48, type: 3}
   m_ValidKeywords: []
   m_InvalidKeywords: []
@@ -37,8 +37,8 @@ Material:
     m_Floats:
     - _BUILTIN_QueueControl: 0
     - _BUILTIN_QueueOffset: 0
-    - _Fresnel: 1.8
-    - _Voronoi: 5
+    - _Fresnel: 1.2
+    - _Voronoi: 50
     m_Colors:
-    - _Color: {r: 0.023529412, g: 0.654902, b: 0.49019608, a: 1}
+    - _Color: {r: 0.94509804, g: 0.63529414, b: 0.03137255, a: 1}
   m_BuildTextureStacks: []

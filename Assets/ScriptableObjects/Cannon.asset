@@ -13,4 +13,6 @@ MonoBehaviour:
   m_Name: Cannon
   m_EditorClassIdentifier: 
   Uses: 2
-  UsesForce: 0
+  UsesForce: 1
+  toolPrefab: {fileID: 5060451863853263577, guid: 6d0f239720810c6458cadd0fe62d621b, type: 3}
+  EquippedOffset: {x: 0, y: 0.85, z: 0}

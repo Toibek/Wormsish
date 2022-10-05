@@ -56,7 +56,7 @@ Material:
     - _Density: 0.5
     - _QueueControl: 0
     - _QueueOffset: 0
-    - _RandomThing: 60.96011
+    - _RandomThing: 5.3289533
     m_Colors:
     - _Color: {r: 0.94509804, g: 0.63529414, b: 0.03137255, a: 1}
     - _SideColor: {r: 0.94509804, g: 0.63529414, b: 0.03137255, a: 1}

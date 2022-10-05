@@ -9,9 +9,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7020285177950449058}
+  - component: {fileID: 1424251320197368512}
   - component: {fileID: 4096853555040389289}
   - component: {fileID: 6262745230636609521}
-  - component: {fileID: 1424251320197368512}
   m_Layer: 0
   m_Name: Airdrop
   m_TagString: Untagged
@@ -36,6 +36,45 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1424251320197368512
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7020285177950449057}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9a31bf354397da446a2e43ba634b16f5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _animationTime: 1
+  _scaleCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: -3.8109777
+      outSlope: -3.8109777
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0.039186053
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: -3.082043
+      outSlope: -3.082043
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.04541707
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  _rotSpeed: 720
+  _confettiPrefab: {fileID: 0}
 --- !u!65 &4096853555040389289
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -65,20 +104,6 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!114 &1424251320197368512
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7020285177950449057}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9a31bf354397da446a2e43ba634b16f5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  AnimationTime: 1
-  ConfettiPrefab: {fileID: 0}
 --- !u!1001 &7020285177578385551
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -116,7 +141,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 78b168a96fd4a1a41a7e36db38542b66, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.7071067
+      value: 0.7071068
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 78b168a96fd4a1a41a7e36db38542b66, type: 3}
       propertyPath: m_LocalRotation.x
@@ -124,15 +149,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 78b168a96fd4a1a41a7e36db38542b66, type: 3}
       propertyPath: m_LocalRotation.y
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 78b168a96fd4a1a41a7e36db38542b66, type: 3}
       propertyPath: m_LocalRotation.z
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 78b168a96fd4a1a41a7e36db38542b66, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
+      value: -90
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 78b168a96fd4a1a41a7e36db38542b66, type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
@@ -194,7 +219,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 432ff85ba5335c64cb7907305342eda6, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.7071067
+      value: 0.7071068
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 432ff85ba5335c64cb7907305342eda6, type: 3}
       propertyPath: m_LocalRotation.x
@@ -206,11 +231,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 432ff85ba5335c64cb7907305342eda6, type: 3}
       propertyPath: m_LocalRotation.z
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 432ff85ba5335c64cb7907305342eda6, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
+      value: -90
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 432ff85ba5335c64cb7907305342eda6, type: 3}
       propertyPath: m_LocalEulerAnglesHint.y

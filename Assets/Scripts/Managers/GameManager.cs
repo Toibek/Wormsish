@@ -46,7 +46,7 @@ public class GameManager : MonoBehaviour
                 pooledAirdrops.Remove(go);
                 return go;
             }
-            return Instantiate(airdropPrefab);
+            return Instantiate(airdropPrefab, transform);
         }
         set
         {
@@ -68,6 +68,15 @@ public class GameManager : MonoBehaviour
         }
     }
     List<Vector3> _positions;
+    public BaseTool RandomToolDrop
+    {
+        get
+        {
+            return Instantiate(DroppableTools[Random.Range(0, DroppableTools.Count)]);
+        }
+    }
+    //Temporary serialization, remove when menu for pickung droppable is done
+    [SerializeField] private List<BaseTool> DroppableTools = new();
 
     public List<Vector3> RefreshPositions()
     {
@@ -101,7 +110,9 @@ public class GameManager : MonoBehaviour
     {
         for (int i = 0; i < PickupPerTurn; i++)
         {
-            Airdrop.transform.position = ValidPosition + (Vector3.up * AirdropHeight);
+            GameObject go = Airdrop;
+            go.transform.position = ValidPosition + (Vector3.up * AirdropHeight);
+            go.SetActive(true);
         }
     }
     public void GameOver(Team winningTeam)

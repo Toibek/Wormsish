@@ -14,5 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Uses: 0
   UsesForce: 0
+  toolPrefab: {fileID: 0}
+  EquippedOffset: {x: 0, y: 0.85, z: 0}
   MaxDistance: 0
   Block: {fileID: 0}

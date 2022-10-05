@@ -19,7 +19,8 @@ public class PlayerManager : MonoBehaviour
     [SerializeField] private Transform _movesHolder;
     [SerializeField] private Transform _specialsHolder;
     [SerializeField] private Transform _teamNamesHolder;
-    [SerializeField] private GameObject pressSpace;
+    [SerializeField] private GameObject _pressSpace;
+    [SerializeField] private Transform _forceBar;
 
     private TMP_Text[] teamNames;
     private CinemachineOrbitalTransposer _followOrbital;
@@ -55,6 +56,7 @@ public class PlayerManager : MonoBehaviour
     {
         if (_teamChange) return;
         _followOrbital.m_XAxis.Value = rotation.x * 0.2f;
+        _activeUnit.Rotate();
     }
     private void ToggleOverview()
     {
@@ -97,7 +99,7 @@ public class PlayerManager : MonoBehaviour
                 UpdateTeamorder();
                 _followCam.Priority = -1;
                 _teamChange = true;
-                pressSpace.SetActive(true);
+                _pressSpace.SetActive(true);
                 _activePlace = new(avaliableTeam, 0);
             }
             else _activePlace = new(_activePlace.x, 0);
@@ -113,7 +115,7 @@ public class PlayerManager : MonoBehaviour
     private void StartNewTeam()
     {
         _followCam.Priority = 1;
-        pressSpace.SetActive(false);
+        _pressSpace.SetActive(false);
         _teamChange = false;
     }
     private void UpdateUiChildren(Transform uiToReset, int amountToEnable, int childToEnable)
@@ -147,7 +149,7 @@ public class PlayerManager : MonoBehaviour
     public void DisplayForce(float f)
     {
         f = Mathf.Clamp01(f);
-
+        _forceBar.GetChild(1).localScale = new(f, 1);
     }
     private void SetActivePlayer(Vector2Int player)
     {
@@ -187,6 +189,8 @@ public class PlayerManager : MonoBehaviour
         _inputHandler.OnRotationStay = Rotation;
         _inputHandler.OnPassTurn = SkipTurn;
         _inputHandler.OnShowMap = ToggleOverview;
+        _inputHandler.OnShootStart = ShootStart;
+        _inputHandler.OnShootEnd = ShootEnd;
 
         DuplicateFirstChild(_specialsHolder, Specials);
         _specialsHolder.gameObject.SetActive(true);
@@ -194,10 +198,20 @@ public class PlayerManager : MonoBehaviour
         DuplicateFirstChild(_movesHolder, Moves);
         _movesHolder.gameObject.SetActive(true);
 
-        pressSpace.SetActive(true);
+        _pressSpace.SetActive(true);
         _teamChange = true;
 
         UpdateTeamorder();
+    }
+    public void ShootStart()
+    {
+        _activeUnit.Tools.ShootStart();
+        _forceBar.gameObject.SetActive(true);
+    }
+    public void ShootEnd()
+    {
+        _activeUnit.Tools.ShootEnd();
+        _forceBar.gameObject.SetActive(false);
     }
     private void DuplicateFirstChild(Transform content, int amount)
     {
@@ -252,6 +266,8 @@ public class PlayerManager : MonoBehaviour
         _inputHandler.OnRotationStay = null;
         _inputHandler.OnPassTurn = null;
         _inputHandler.OnShowMap = null;
+        _inputHandler.OnShootStart = null;
+        _inputHandler.OnShootEnd = null;
         _followCam.Priority = -1;
 
         _gameManager.GameOver(team);

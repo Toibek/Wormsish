@@ -63,13 +63,9 @@ public class UnitTools : MonoBehaviour
             }
         }
         tools.Add(tool);
-        toolObjects.Add(Instantiate
-            (
-            tool.toolPrefab,
-            transform.position + tool.EquippedOffset,
-            Quaternion.identity,
-            transform
-            ));
+        GameObject go = Instantiate(tool.ToolPrefab, transform.position + tool.EquippedOffset, Quaternion.identity, transform);
+        tool.EquippedTransform = go.transform;
+        toolObjects.Add(go);
     }
     public void ChangeTool(int toolToUse)
     {
@@ -104,36 +100,40 @@ public class UnitTools : MonoBehaviour
         _force = 0;
         while (true)
         {
-            for (_force = 0; _force < 1; _force += Time.deltaTime * 2)
+            for (_force = 0.2f; _force < 1; _force += Time.deltaTime * 2)
             {
                 Unit.PlayerManager.DisplayForce(_force);
                 yield return new WaitForEndOfFrame();
             }
-            for (_force = 1; _force >= 0; _force -= Time.deltaTime * 2)
+            for (_force = 1; _force >= 0.2f; _force -= Time.deltaTime * 2)
             {
                 Unit.PlayerManager.DisplayForce(_force);
                 yield return new WaitForEndOfFrame();
             }
         }
     }
-    public void ShootEnd()
+    public bool ShootEnd()
     {
-        if (ActiveTool == null) return;
+        if (ActiveTool == null) return false;
         BaseTool tool = ActiveTool;
         if (tool.UsesForce)
         {
             StopCoroutine(forceRoutine);
             tool.Use(transform, _force);
+            if (tool.Uses == 0) ClearTool(_activeTool);
+            return true;
         }
         else
         {
             tool.Use(transform);
+            if (tool.Uses == 0) ClearTool(_activeTool);
+            return true;
         }
-        if (tool == null)
-        {
-            tools.RemoveAt(_activeTool);
-            Destroy(toolObjects[_activeTool]);
-            toolObjects.RemoveAt(_activeTool);
-        }
+    }
+    void ClearTool(int tool)
+    {
+        tools.RemoveAt(tool);
+        Destroy(toolObjects[tool]);
+        toolObjects.RemoveAt(tool);
     }
 }

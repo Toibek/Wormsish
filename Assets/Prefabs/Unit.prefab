@@ -83,6 +83,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Unit: {fileID: 0}
+  tools: []
 --- !u!114 &385977198544063531
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -95,7 +96,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0ca0e8f9c8c8f9947965c50d6a68c7f4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _maxHealth: 100
+  MaxHealth: 100
 --- !u!54 &8547682345675065913
 Rigidbody:
   m_ObjectHideFlags: 0

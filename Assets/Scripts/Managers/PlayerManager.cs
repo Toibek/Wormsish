@@ -168,14 +168,16 @@ public class PlayerManager : MonoBehaviour
         for (int team = 0; team < Teams.Count; team++)
         {
             Teams[team].Active = true;
-            Material mat = new(_unitMaterial);
-            mat.color = Teams[team].Color;
             for (int unit = 0; unit < TeamSize; unit++)
             {
+                Material mat = new(_unitMaterial);// new(_unitMaterial);
+                mat.color = Teams[team].Color;
+
                 Ray ray = new(_gameManager.ValidPosition + Vector3.up * 50, Vector2.down);
                 Physics.Raycast(ray, out var hit);
                 GameObject go = Instantiate(_unitPrefab, hit.point + new Vector3(0, 0.5f, 0), Quaternion.identity, transform);
                 go.GetComponentInChildren<MeshRenderer>().material = mat;
+                go.GetComponent<UnitDamageable>().Material = mat;
                 Unit u = go.GetComponent<Unit>();
                 u.PlayerManager = this;
                 Teams[team].Units.Add(u);
@@ -205,12 +207,21 @@ public class PlayerManager : MonoBehaviour
     }
     public void ShootStart()
     {
+        if (_teamChange) return;
+        if (_currentSpecials <= 0) return;
+
         _activeUnit.Tools.ShootStart();
-        _forceBar.gameObject.SetActive(true);
+        if (_activeUnit.Tools.ActiveTool.UsesForce)
+            _forceBar.gameObject.SetActive(true);
     }
     public void ShootEnd()
     {
-        _activeUnit.Tools.ShootEnd();
+        if (_teamChange) return;
+        if (_currentSpecials <= 0) return;
+
+        if (_activeUnit.Tools.ShootEnd())
+            UpdateUiChildren(_specialsHolder, --_currentSpecials, 0);
+
         _forceBar.gameObject.SetActive(false);
     }
     private void DuplicateFirstChild(Transform content, int amount)

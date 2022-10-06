@@ -9,7 +9,7 @@ public class WeaponPickup : MonoBehaviour
     private void Start()
     {
         _tool = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameManager>().RandomToolDrop;
-        Instantiate(_tool.toolPrefab, transform);
+        _tool.EquippedTransform = Instantiate(_tool.ToolPrefab, transform).transform;
     }
     private void Update()
     {

@@ -75,7 +75,7 @@ public class GameManager : MonoBehaviour
             return Instantiate(DroppableTools[Random.Range(0, DroppableTools.Count)]);
         }
     }
-    //Temporary serialization, remove when menu for pickung droppable is done
+    //Temporary serialization, remove when menu for picking droppable is done
     [SerializeField] private List<BaseTool> DroppableTools = new();
 
     public List<Vector3> RefreshPositions()

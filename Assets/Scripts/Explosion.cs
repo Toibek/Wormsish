@@ -6,6 +6,7 @@ public class Explosion : MonoBehaviour
 {
     private int _damage = 0;
     private bool _started = false;
+    List<Damageable> Damaged = new List<Damageable>();
     public void StartExplosive(int damage)
     {
         _damage = damage;
@@ -14,9 +15,11 @@ public class Explosion : MonoBehaviour
     }
     private void OnTriggerStay(Collider other)
     {
-        if (_started && other.GetComponent<Damageable>())
+        Damageable d;
+        if (_started && other.TryGetComponent(out d) && !Damaged.Contains(d))
         {
-            other.GetComponent<Damageable>().Damage(_damage);
+            d.Damage(_damage);
+            Damaged.Add(d);
         }
     }
 }

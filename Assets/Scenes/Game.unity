@@ -928,6 +928,9 @@ MonoBehaviour:
   - Name: Healthpacks
     Prefab: {fileID: 5401020676975986223, guid: b6fc0563d4c91d94c9f1610f4957637e, type: 3}
     BaseAmount: 5
+  - Name: Weapon
+    Prefab: {fileID: 8891403136955405537, guid: faec905affced304d9b9a7b48a4ece4c, type: 3}
+    BaseAmount: 5
   Pickups:
   - Name: Healthpack
     Prefab: {fileID: 5401020676975986223, guid: b6fc0563d4c91d94c9f1610f4957637e, type: 3}
@@ -1524,6 +1527,10 @@ MonoBehaviour:
       m_Calls: []
     m_ActionId: f10d6931-8d8c-47f2-b59d-3ecfe6d02e9c
     m_ActionName: UI/TrackedDeviceOrientation
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 3a93812c-8276-4088-b31b-4c5f0f37945f
+    m_ActionName: Player/ChangeWeapon[/Keyboard/q,/Keyboard/e]
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
   m_DefaultActionMap: Player
@@ -1558,7 +1565,7 @@ MonoBehaviour:
   Moves: 0
   Specials: 0
   _unitPrefab: {fileID: 8547682345675065914, guid: 17413f2fde65cb5439b1a9c054d6cd86, type: 3}
-  _unitMaterial: {fileID: 2100000, guid: 8c78853c65be4624ca34059ebdb331a6, type: 2}
+  _unitMaterial: {fileID: 2100000, guid: 804e67196ebf55047be0a0adfb1eed0d, type: 2}
   _followCam: {fileID: 33180842}
   _movesHolder: {fileID: 1988346029}
   _specialsHolder: {fileID: 1064372393}
@@ -6737,7 +6744,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &778715686
 RectTransform:
   m_ObjectHideFlags: 0

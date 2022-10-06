@@ -32,9 +32,9 @@ public class Unit : MonoBehaviour
     {
         Vector3 org = transform.position;
         Vector3 cam = Camera.position;
-        Vector3 dif = (new Vector3(cam.x, 0, cam.z) - new Vector3(org.x, 0, org.z)).normalized;
+        Vector3 dif = (new Vector3(org.x, 0, org.z) - new Vector3(cam.x, 0, cam.z)).normalized;
         float rot = Mathf.Atan2(dif.x, dif.z) * Mathf.Rad2Deg;
-        rot = Mathf.Round(rot / 45) * 45;
+        //rot = Mathf.Round(rot / 45) * 45;
         //Movement.Rotation(rot);
         Tools.Rotation(rot);
     }

@@ -4,21 +4,25 @@ using UnityEngine;
 
 public class Damageable : MonoBehaviour
 {
-    [SerializeField] protected int _maxHealth;
-    protected int _health;
-    private void Start()
+    public int MaxHealth;
+    public int _health;
+    protected void Start()
     {
-        _health = _maxHealth;
+        _health = MaxHealth;
     }
     public void Damage(int damage)
     {
-        _health -= damage;
-        if (_health < 0)
-            LethalDamage();
+        ChangeHealth(-damage);
     }
     public void Heal(int health)
     {
-        _health += health;
+        ChangeHealth(health);
+    }
+    public virtual void ChangeHealth(int change)
+    {
+        _health = Mathf.Clamp(_health + change, 0, MaxHealth);
+        if (_health == 0)
+            LethalDamage();
     }
     public virtual void LethalDamage()
     {

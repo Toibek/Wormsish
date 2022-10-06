@@ -7,6 +7,7 @@ using UnityEngine.UI;
 
 public class StateToggle : Selectable, IPointerClickHandler, ISubmitHandler, ICanvasElement
 {
+    public Image Content;
     public Image StateImage;
     [Space]
     public List<Sprite> States;

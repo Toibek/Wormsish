@@ -73,11 +73,13 @@ public class GameManager : MonoBehaviour
     {
         get
         {
+            if (DroppableTools == null || DroppableTools.Count == 0) return null;
             return Instantiate(DroppableTools[Random.Range(0, DroppableTools.Count)]);
         }
     }
-    //Temporary serialization, remove when menu for picking droppable is done
-    [SerializeField] private List<BaseTool> DroppableTools = new();
+    public List<BaseTool> AllTools = new();
+    internal List<BaseTool> DroppableTools = new();
+    internal List<BaseTool> InfiniteTools = new();
 
     public List<Vector3> RefreshPositions()
     {
@@ -102,6 +104,7 @@ public class GameManager : MonoBehaviour
     }
     public void StartGame()
     {
+        PlayerManager.InfiniteTools = InfiniteTools;
         PlayerManager.TeamSize = Units;
         PlayerManager.Moves = Moves;
         PlayerManager.Specials = Specials;

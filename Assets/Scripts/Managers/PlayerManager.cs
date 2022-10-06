@@ -22,6 +22,8 @@ public class PlayerManager : MonoBehaviour
     [SerializeField] private GameObject _pressSpace;
     [SerializeField] private Transform _forceBar;
 
+    internal List<BaseTool> InfiniteTools;
+
     private TMP_Text[] teamNames;
     private CinemachineOrbitalTransposer _followOrbital;
     private Unit _activeUnit;
@@ -46,7 +48,7 @@ public class PlayerManager : MonoBehaviour
         {
             if (--_currentMoves == 0 && _currentSpecials == 0)
             {
-                _gameManager.SpawnAirdrops();
+                ChangeUnit();
             }
             UpdateUiChildren(_specialsHolder, _currentSpecials, 0);
             UpdateUiChildren(_movesHolder, _currentMoves, 0);
@@ -182,6 +184,12 @@ public class PlayerManager : MonoBehaviour
                 u.PlayerManager = this;
                 Teams[team].Units.Add(u);
 
+                for (int i = 0; i < InfiniteTools.Count; i++)
+                {
+                    InfiniteTools[i].Uses = -1;
+                    u.Tools.AddTool(Instantiate(InfiniteTools[i]));
+                }
+
                 yield return new WaitForEndOfFrame();
             }
         }
@@ -207,7 +215,7 @@ public class PlayerManager : MonoBehaviour
     }
     public void ShootStart()
     {
-        if (_teamChange) return;
+        if (_teamChange || _activeUnit.Tools.ActiveTool == null) return;
         if (_currentSpecials <= 0) return;
 
         _activeUnit.Tools.ShootStart();
@@ -216,7 +224,7 @@ public class PlayerManager : MonoBehaviour
     }
     public void ShootEnd()
     {
-        if (_teamChange) return;
+        if (_teamChange || _activeUnit.Tools.ActiveTool == null) return;
         if (_currentSpecials <= 0) return;
 
         if (_activeUnit.Tools.ShootEnd())

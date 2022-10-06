@@ -22,7 +22,8 @@ public class MenuManager : MonoBehaviour
     [SerializeField] private UpDownValue _specials;
     [SerializeField] private UpDownValue _pickup;
     [Space]
-    [SerializeField] private List<UpDownValue> Objects;
+    [SerializeField] private List<UpDownValue> _objects;
+    [SerializeField] private List<StateToggle> _pickups;
     [Header("InGame")]
     [SerializeField] private View _hudView;
     [Header("Settings")]
@@ -30,6 +31,8 @@ public class MenuManager : MonoBehaviour
     [Header("GameOver")]
     [SerializeField] private View _gameOverView;
     [SerializeField] private TMP_Text WinnerText;
+
+
     private GameManager _gameManager;
     private string[] _randomNameArray;
 
@@ -40,20 +43,37 @@ public class MenuManager : MonoBehaviour
         _randomNameArray = _randomNames.Split(' ');
         for (int i = 0; i < _playerSettings.Count; i++)
             _playerSettings[i].Name = _randomNameArray[Random.Range(0, _randomNameArray.Length)];
+
         for (int i = 0; i < _gameManager.Spawnables.Length; i++)
         {
-            if (Objects.Count > i)
+            if (_objects.Count > i)
             {
-                Objects[i].ValueName = _gameManager.Spawnables[i].Name;
-                Objects[i].CurrentValue = _gameManager.Spawnables[i].BaseAmount;
+                _objects[i].ValueName = _gameManager.Spawnables[i].Name;
+                _objects[i].CurrentValue = _gameManager.Spawnables[i].BaseAmount;
             }
             else
             {
-                GameObject go = Instantiate(Objects[0].gameObject, Objects[0].transform.parent);
+                GameObject go = Instantiate(_objects[0].gameObject, _objects[0].transform.parent);
                 UpDownValue udv = go.GetComponent<UpDownValue>();
                 udv.ValueName = _gameManager.Spawnables[i].Name;
                 udv.CurrentValue = _gameManager.Spawnables[i].BaseAmount;
-                Objects.Add(udv);
+                _objects.Add(udv);
+            }
+        }
+
+        for (int i = 0; i < _gameManager.AllTools.Count; i++)
+        {
+            if (_pickups.Count > i)
+            {
+                _pickups[i].Content.sprite = _gameManager.AllTools[i].ToolIcon;
+                _pickups[i].CurrentState = 1;
+            }
+            else
+            {
+                GameObject go = Instantiate(_pickups[0].gameObject, _pickups[0].transform.parent);
+                StateToggle stog = go.GetComponent<StateToggle>();
+                stog.Content.sprite = _gameManager.AllTools[i].ToolIcon;
+                _pickups[i].CurrentState = 1;
             }
         }
         _removePlayerButton.interactable = false;
@@ -132,10 +152,15 @@ public class MenuManager : MonoBehaviour
         _gameManager.Moves = _moves.CurrentValue;
         _gameManager.Specials = _specials.CurrentValue;
         _gameManager.PickupPerTurn = _pickup.CurrentValue;
-        for (int i = 0; i < Objects.Count; i++)
-            _gameManager.ObjectGen.SpawnOnGround(_gameManager.Spawnables[i], Objects[i].CurrentValue);
+        for (int i = 0; i < _objects.Count; i++)
+            _gameManager.ObjectGen.SpawnOnGround(_gameManager.Spawnables[i], _objects[i].CurrentValue);
         for (int i = 0; i < _playerSettings.Count; i++)
             _gameManager.SetTeam(_playerSettings[i].Name, _playerSettings[i].Color);
+        for (int i = 0; i < _pickups.Count; i++)
+        {
+            if (_pickups[i].CurrentState == 1) _gameManager.DroppableTools.Add(_gameManager.AllTools[i]);
+            else if (_pickups[i].CurrentState == 2) _gameManager.InfiniteTools.Add(_gameManager.AllTools[i]);
+        }
         _setupView.Hide();
         _hudView.Show();
         _gameManager.StartGame();

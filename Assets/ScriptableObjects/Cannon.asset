@@ -15,6 +15,7 @@ MonoBehaviour:
   Uses: 2
   UsesForce: 1
   ToolPrefab: {fileID: 5060451863853263577, guid: 6d0f239720810c6458cadd0fe62d621b, type: 3}
+  ToolIcon: {fileID: 21300000, guid: 125d6b7b37c5cd249b61ca9706635105, type: 3}
   EquippedOffset: {x: 0, y: 0.85, z: 0}
   Projectile: {fileID: 1110595001398510527, guid: 0829349a8c95adc478aa2086a19b7b42, type: 3}
   ShootForce: 20

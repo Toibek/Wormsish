@@ -19,6 +19,11 @@ public class ToolPickup : MonoBehaviour
             }
         if (_tool == null)
             _tool = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameManager>().RandomToolDrop;
+        if (_tool == null)
+        {
+            GetComponent<Damageable>().LethalDamage();
+            return;
+        }
         _tool.EquippedTransform = Instantiate(_tool.ToolPrefab, transform).transform;
     }
     private void Update()

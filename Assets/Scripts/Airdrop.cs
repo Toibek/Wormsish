@@ -42,6 +42,9 @@ public class Airdrop : MonoBehaviour
         Drop.transform.position = transform.position;
         Drop.SetActive(true);
 
+        if (Drop.TryGetComponent<ToolPickup>(out var tool))
+            tool.GetTool();
+
         _crate.localScale = new(_scaleRef, _scaleRef, _scaleRef);
         _crate.rotation = Quaternion.Euler(-90, 0, 0);
         transform.GetChild(1).gameObject.SetActive(true);

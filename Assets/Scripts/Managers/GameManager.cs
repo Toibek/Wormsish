@@ -31,6 +31,7 @@ public class GameManager : MonoBehaviour
         {
             SpawnableObject spawnable = Pickups[Random.Range(0, Pickups.Length)];
             GameObject go = spawnable.GetObject(new(0, 0, 0), ObjectGen.transform);
+            ObjectGen._activeObjects.Add(go);
             go.SetActive(false);
             return go;
         }

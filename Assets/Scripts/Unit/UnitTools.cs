@@ -63,9 +63,11 @@ public class UnitTools : MonoBehaviour
             }
         }
         tools.Add(tool);
-        GameObject go = Instantiate(tool.ToolPrefab, transform.position + tool.EquippedOffset, Quaternion.identity, transform);
-        tool.EquippedTransform = go.transform;
-        toolObjects.Add(go);
+        Transform t = tool.EquippedTransform;
+        t.position = transform.position + tool.EquippedOffset;
+        t.rotation = Quaternion.identity;
+        t.parent = transform;
+        toolObjects.Add(t.gameObject);
     }
     public void ChangeTool(int toolToUse)
     {

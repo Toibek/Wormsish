@@ -6,7 +6,7 @@ public class ObjectManager : MonoBehaviour
 {
     public float AirDropPosition;
     public float GroundDropCheck;
-    private List<GameObject> _activeObjects = new();
+    internal List<GameObject> _activeObjects = new();
     private GameManager _gameManager;
 
     private void Awake()

@@ -96,11 +96,11 @@ public class PlayerManager : MonoBehaviour
                 }
             if (avaliableTeam != -1)
             {
-                UpdateTeamorder();
                 _followCam.Priority = -1;
                 _teamChange = true;
                 _pressSpace.SetActive(true);
                 _activePlace = new(avaliableTeam, 0);
+                UpdateTeamorder();
             }
             else _activePlace = new(_activePlace.x, 0);
         }
@@ -170,7 +170,7 @@ public class PlayerManager : MonoBehaviour
             Teams[team].Active = true;
             for (int unit = 0; unit < TeamSize; unit++)
             {
-                Material mat = new(_unitMaterial);// new(_unitMaterial);
+                Material mat = new(_unitMaterial);
                 mat.color = Teams[team].Color;
 
                 Ray ray = new(_gameManager.ValidPosition + Vector3.up * 50, Vector2.down);

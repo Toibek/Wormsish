@@ -4,15 +4,16 @@ using UnityEngine;
 
 public class UnitTools : MonoBehaviour
 {
-    public Unit Unit;
-    public BaseTool previousTool
+    [SerializeField] float _forceSpeed;
+    internal Unit Unit;
+    public BaseTool PreviousTool
     {
         get
         {
             int t = _activeTool;
-            if (tools.Count < 3) return null;
-            if (--t < 0) t = tools.Count - 1;
-            return tools[t];
+            if (_tools.Count < 3) return null;
+            if (--t < 0) t = _tools.Count - 1;
+            return _tools[t];
 
         }
     }
@@ -20,24 +21,24 @@ public class UnitTools : MonoBehaviour
     {
         get
         {
-            if (tools.Count == 0) return null;
-            return tools[_activeTool];
+            if (_tools.Count == 0) return null;
+            return _tools[_activeTool];
         }
     }
-    public List<BaseTool> tools = new();
-
     public BaseTool NextTool
     {
         get
         {
             int t = _activeTool;
-            if (tools.Count < 2) return null;
-            if (++t <= tools.Count) t = 0;
-            return tools[t];
+            if (_tools.Count < 2) return null;
+            if (++t <= _tools.Count) t = 0;
+            return _tools[t];
         }
     }
+    private List<BaseTool> _tools = new();
 
-    GameObject ToolObject
+
+    private GameObject ToolObject
     {
         get
         {
@@ -46,23 +47,39 @@ public class UnitTools : MonoBehaviour
             return null;
         }
     }
-    List<GameObject> toolObjects = new();
-    int _activeTool;
+    private List<GameObject> toolObjects = new();
+    private int _activeTool
+    {
+        get { return _at; }
+        set
+        {
+            _at = value;
+            for (int i = 0; i < _tools.Count; i++)
+            {
+                if (i != _at)
+                    _tools[i].EquippedTransform.gameObject.SetActive(false);
+                else
+                    _tools[i].EquippedTransform.gameObject.SetActive(true);
+            }
+        }
+    }
+    private int _at;
 
-    Coroutine forceRoutine;
+    private Coroutine forceRoutine;
 
-    float _force = 0;
+    private float _force = 0;
+
     public void AddTool(BaseTool tool)
     {
-        for (int i = 0; i < tools.Count; i++)
+        for (int i = 0; i < _tools.Count; i++)
         {
-            if (tools[i].name == tool.name)
+            if (_tools[i].name == tool.name)
             {
-                tools[i].Uses += tool.Uses;
+                _tools[i].Uses += tool.Uses;
                 return;
             }
         }
-        tools.Add(tool);
+        _tools.Add(tool);
         Transform t;
         if (tool.EquippedTransform == null)
         {
@@ -71,6 +88,8 @@ public class UnitTools : MonoBehaviour
                 transform.position + tool.EquippedOffset,
                 Quaternion.identity,
                 transform).transform;
+            if (_tools.Count != 1)
+                t.gameObject.SetActive(false);
             tool.EquippedTransform = t;
         }
         else
@@ -78,6 +97,8 @@ public class UnitTools : MonoBehaviour
             t = tool.EquippedTransform;
             t.SetPositionAndRotation(transform.position + tool.EquippedOffset, Quaternion.identity);
             t.parent = transform;
+            if (_tools.Count != 1)
+                t.gameObject.SetActive(false);
         }
         toolObjects.Add(t.gameObject);
     }
@@ -85,14 +106,14 @@ public class UnitTools : MonoBehaviour
     {
         _activeTool = toolToUse;
     }
-    public void SwitchTool(float val)
+    public void ChangeTool(float val)
     {
         int dir = (int)Mathf.Sign(val);
-        if (tools.Count == 0)
+        if (_tools.Count == 0)
         {
             return;
         }
-        _activeTool = (_activeTool + 1) % tools.Count;
+        _activeTool = (_activeTool + 1) % _tools.Count;
     }
     public void Rotation(float rot)
     {
@@ -114,12 +135,12 @@ public class UnitTools : MonoBehaviour
         _force = 0;
         while (true)
         {
-            for (_force = 0.2f; _force < 1; _force += Time.deltaTime * 2)
+            for (_force = 0.1f; _force < 1f; _force += Time.deltaTime * _forceSpeed)
             {
                 Unit.PlayerManager.DisplayForce(_force);
                 yield return new WaitForEndOfFrame();
             }
-            for (_force = 1; _force >= 0.2f; _force -= Time.deltaTime * 2)
+            for (_force = 1f; _force >= 0.1f; _force -= Time.deltaTime * _forceSpeed)
             {
                 Unit.PlayerManager.DisplayForce(_force);
                 yield return new WaitForEndOfFrame();
@@ -133,21 +154,22 @@ public class UnitTools : MonoBehaviour
         if (tool.UsesForce)
         {
             StopCoroutine(forceRoutine);
-            tool.Use(transform, _force);
+            tool.Use(ActiveTool.EquippedTransform, _force);
             if (tool.Uses == 0) ClearTool(_activeTool);
             return true;
         }
         else
         {
-            tool.Use(transform);
+            tool.Use(ActiveTool.EquippedTransform);
             if (tool.Uses == 0) ClearTool(_activeTool);
             return true;
         }
     }
     void ClearTool(int tool)
     {
-        tools.RemoveAt(tool);
+        _tools.RemoveAt(tool);
         Destroy(toolObjects[tool]);
         toolObjects.RemoveAt(tool);
+        _activeTool = 0;
     }
 }

@@ -38,7 +38,7 @@ public class UnitMovement : MonoBehaviour
 
             Vector3 endPosition = transform.position;
             Ray heightCheckRay = new(transform.position + new Vector3(0, _jumpHeight, 0), movement);
-            if (!Physics.Raycast(heightCheckRay, 1f, _layerMask))
+            if (!Physics.Raycast(heightCheckRay, 1f, _layerMask, QueryTriggerInteraction.Ignore))
             {
                 Ray positioningRay = new(transform.position + movement + Vector3.up * 3, Vector3.down);
                 Debug.DrawRay(positioningRay.origin, positioningRay.direction + new Vector3(0, -1, 0) * 20);

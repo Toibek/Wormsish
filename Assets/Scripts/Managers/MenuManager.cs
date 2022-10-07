@@ -44,7 +44,7 @@ public class MenuManager : MonoBehaviour
         for (int i = 0; i < _playerSettings.Count; i++)
             _playerSettings[i].Name = _randomNameArray[Random.Range(0, _randomNameArray.Length)];
 
-        for (int i = 0; i < _gameManager.Spawnables.Length; i++)
+        for (int i = 0; i < _gameManager.Spawnables.Count; i++)
         {
             if (_objects.Count > i)
             {
@@ -73,6 +73,7 @@ public class MenuManager : MonoBehaviour
                 GameObject go = Instantiate(_pickups[0].gameObject, _pickups[0].transform.parent);
                 StateToggle stog = go.GetComponent<StateToggle>();
                 stog.Content.sprite = _gameManager.AllTools[i].ToolIcon;
+                _pickups.Add(stog);
                 _pickups[i].CurrentState = 1;
             }
         }
@@ -161,6 +162,8 @@ public class MenuManager : MonoBehaviour
             if (_pickups[i].CurrentState == 1) _gameManager.DroppableTools.Add(_gameManager.AllTools[i]);
             else if (_pickups[i].CurrentState == 2) _gameManager.InfiniteTools.Add(_gameManager.AllTools[i]);
         }
+
+
         _setupView.Hide();
         _hudView.Show();
         _gameManager.StartGame();

@@ -114,6 +114,11 @@ public class PlayerManager : MonoBehaviour
         UpdateUiChildren(_specialsHolder, _currentSpecials, 0);
         UpdateUiChildren(_movesHolder, _currentMoves, 0);
     }
+    void ChangeTool(float direction)
+    {
+        if (_teamChange) return;
+        _activeUnit.Tools.ChangeTool(Mathf.Sign(direction));
+    }
     private void StartNewTeam()
     {
         _followCam.Priority = 1;
@@ -189,6 +194,7 @@ public class PlayerManager : MonoBehaviour
                     InfiniteTools[i].Uses = -1;
                     u.Tools.AddTool(Instantiate(InfiniteTools[i]));
                 }
+                //u.Tools.ChangeTool(0);
 
                 yield return new WaitForEndOfFrame();
             }
@@ -201,6 +207,7 @@ public class PlayerManager : MonoBehaviour
         _inputHandler.OnShowMap = ToggleOverview;
         _inputHandler.OnShootStart = ShootStart;
         _inputHandler.OnShootEnd = ShootEnd;
+        _inputHandler.OnChangeTool = ChangeTool;
 
         DuplicateFirstChild(_specialsHolder, Specials);
         _specialsHolder.gameObject.SetActive(true);
@@ -287,6 +294,7 @@ public class PlayerManager : MonoBehaviour
         _inputHandler.OnShowMap = null;
         _inputHandler.OnShootStart = null;
         _inputHandler.OnShootEnd = null;
+        _inputHandler.OnChangeTool = null;
         _followCam.Priority = -1;
 
         _gameManager.GameOver(team);

@@ -10,8 +10,8 @@ public class GameManager : MonoBehaviour
     [Space]
     public int AirdropHeight = 10;
     [Space]
-    public SpawnableObject[] Spawnables;
-    public SpawnableObject[] Pickups;
+    public List<SpawnableObject> Spawnables = new();
+    public List<SpawnableObject> Pickups = new();
 
     [SerializeField] GameObject airdropPrefab;
 
@@ -29,7 +29,7 @@ public class GameManager : MonoBehaviour
     {
         get
         {
-            SpawnableObject spawnable = Pickups[Random.Range(0, Pickups.Length)];
+            SpawnableObject spawnable = Pickups[Random.Range(0, Pickups.Count)];
             GameObject go = spawnable.GetObject(new(0, 0, 0), ObjectGen.transform);
             ObjectGen._activeObjects.Add(go);
             go.SetActive(false);
@@ -104,6 +104,14 @@ public class GameManager : MonoBehaviour
     }
     public void StartGame()
     {
+        if (DroppableTools.Count == 0)
+        {
+            for (int i = 0; i < Spawnables.Count; i++)
+                if (Spawnables[i].Name == "Weapon") Spawnables.RemoveAt(i);
+            for (int i = 0; i < Pickups.Count; i++)
+                if (Pickups[i].Name == "Weapon") Pickups.RemoveAt(i);
+        }
+
         PlayerManager.InfiniteTools = InfiniteTools;
         PlayerManager.TeamSize = Units;
         PlayerManager.Moves = Moves;

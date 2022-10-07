@@ -92,7 +92,6 @@ public class IslandManager : MonoBehaviour
                     if (_activeMap[x, y, z])
                     {
                         GameObject go = GetCube(new Vector3(x, y, z) + _mapOffset);
-                        _activeMapObjects[x, y, z] = go;
                         if (y < _activeMap.GetLength(1) - 1 && _activeMap[x, y + 1, z])
                             go.GetComponent<MeshRenderer>().material = _botMaterial;
                         else
@@ -112,6 +111,8 @@ public class IslandManager : MonoBehaviour
     /// <returns>the spawned cube</returns>
     public GameObject GetCube(Vector3 position)
     {
+        Vector3Int posInt = Utils.RoundVector3ToInt(position - _mapOffset);
+        if (_activeMapObjects[posInt.x, posInt.y, posInt.z]) return null;
         //check wether or not there's inactive cubes saved
         if (_inactiveCubes.Count > 0)
         {
@@ -120,12 +121,15 @@ public class IslandManager : MonoBehaviour
             go.transform.position = position;
             go.SetActive(true);
             _inactiveCubes.Remove(go);
+            _activeMapObjects[posInt.x, posInt.y, posInt.z] = go;
             return go;
         }
         else
         {
             //Create and place a new cube
             GameObject go = Instantiate(_cubePrefab, position, Quaternion.identity, transform);
+            _activeMapObjects[posInt.x, posInt.y, posInt.z] = go;
+
             return go;
         }
     }

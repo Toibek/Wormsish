@@ -13,10 +13,13 @@ public class InputHandler : MonoBehaviour
     public EmptyDelegate OnShowMap;
     public EmptyDelegate OnShootStart;
     public EmptyDelegate OnShootEnd;
+    public FloatDelegate OnChangeTool;
+
 
 
     public delegate void EmptyDelegate();
-    public delegate void VectorDelegate(Vector2 vector2);
+    public delegate void VectorDelegate(Vector2 value);
+    public delegate void FloatDelegate(float value);
 
     private Vector2 _movement = Vector2.zero;
     private Coroutine _continousMoveRoutine;
@@ -89,5 +92,11 @@ public class InputHandler : MonoBehaviour
     {
         if (context.started)
             OnPassTurn?.Invoke();
+    }
+    public void ChangeWeapon(InputAction.CallbackContext context)
+    {
+        if (context.started)
+            OnChangeTool?.Invoke((float)context.ReadValueAsObject());
+
     }
 }

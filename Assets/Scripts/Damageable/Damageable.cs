@@ -5,7 +5,7 @@ using UnityEngine;
 public class Damageable : MonoBehaviour
 {
     public int MaxHealth;
-    public int _health;
+    protected int _health;
     protected void Start()
     {
         _health = MaxHealth;

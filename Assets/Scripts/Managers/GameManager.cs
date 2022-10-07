@@ -12,6 +12,7 @@ public class GameManager : MonoBehaviour
     [Space]
     public List<SpawnableObject> Spawnables = new();
     public List<SpawnableObject> Pickups = new();
+    public bool Paused = false;
 
     [SerializeField] GameObject airdropPrefab;
 

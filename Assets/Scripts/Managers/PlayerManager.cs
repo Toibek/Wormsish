@@ -43,26 +43,23 @@ public class PlayerManager : MonoBehaviour
     }
     private void MoveUnit(Vector2 moveDirection)
     {
-        if (_teamChange) return;
+        if (_teamChange || _gameManager.Paused) return;
         if (_currentMoves > 0 && _activeUnit.Movement.Move(moveDirection))
         {
-            if (--_currentMoves == 0 && _currentSpecials == 0)
-            {
-                ChangeUnit();
-            }
+            --_currentMoves;
             UpdateUiChildren(_specialsHolder, _currentSpecials, 0);
             UpdateUiChildren(_movesHolder, _currentMoves, 0);
         }
     }
     public void Rotation(Vector2 rotation)
     {
-        if (_teamChange) return;
+        if (_teamChange || _gameManager.Paused) return;
         _followOrbital.m_XAxis.Value = rotation.x * 0.2f;
         _activeUnit.Rotate();
     }
     private void ToggleOverview()
     {
-        if (_teamChange) return;
+        if (_teamChange || _gameManager.Paused) return;
         _followCam.Priority *= -1;
     }
     public void SkipTurn()
@@ -116,7 +113,7 @@ public class PlayerManager : MonoBehaviour
     }
     void ChangeTool(float direction)
     {
-        if (_teamChange) return;
+        if (_teamChange || _gameManager.Paused) return;
         _activeUnit.Tools.ChangeTool(Mathf.Sign(direction));
     }
     private void StartNewTeam()
@@ -278,6 +275,11 @@ public class PlayerManager : MonoBehaviour
     }
     private void DeclareWinner(Team team)
     {
+        ClearPlayers();
+        _gameManager.GameOver(team);
+    }
+    public void ClearPlayers()
+    {
         for (int t = Teams.Count - 1; t >= 0; t--)
         {
             for (int u = Teams[t].Units.Count - 1; u >= 0; u--)
@@ -296,8 +298,6 @@ public class PlayerManager : MonoBehaviour
         _inputHandler.OnShootEnd = null;
         _inputHandler.OnChangeTool = null;
         _followCam.Priority = -1;
-
-        _gameManager.GameOver(team);
     }
 }
 

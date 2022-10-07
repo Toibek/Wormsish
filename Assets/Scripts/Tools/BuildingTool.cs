@@ -16,6 +16,7 @@ public class BuildingTool : BaseTool
         float rot = Mathf.Round(unit.transform.rotation.eulerAngles.y / 90) * 90f;
         Vector3 forward = Quaternion.Euler(0, rot, 0) * Vector3.forward;
         Vector3 right = Quaternion.Euler(0, rot, 0) * Vector3.right;
+
         Vector3Int startPos = Utils.RoundVector3ToInt(unit.transform.position + buildOffset + (forward - right));
         for (int y = 0; y < Distance; y++)
         {

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
+using UnityEngine.InputSystem;
 
 public class MenuManager : MonoBehaviour
 {
@@ -26,8 +27,8 @@ public class MenuManager : MonoBehaviour
     [SerializeField] private List<StateToggle> _pickups;
     [Header("InGame")]
     [SerializeField] private View _hudView;
-    [Header("Settings")]
-    [SerializeField] private View _settingsView;
+    [SerializeField] private View _pauseView;
+    [Header("Pause")]
     [Header("GameOver")]
     [SerializeField] private View _gameOverView;
     [SerializeField] private TMP_Text WinnerText;
@@ -87,14 +88,7 @@ public class MenuManager : MonoBehaviour
         _gameManager.IslandGen.GenerateIfEmpty();
         _setupView.Show();
     }
-    public void OpenSettings()
-    {
-        //open the menu
-    }
-    public void CloseSettings()
-    {
-        //close and save stuff i guess
-    }
+
     public void Quit()
     {
         Application.Quit();
@@ -168,6 +162,44 @@ public class MenuManager : MonoBehaviour
         _hudView.Show();
         _gameManager.StartGame();
     }
+    #endregion
+
+    #region inGame
+    public void Pause()
+    {
+        if (!_hudView.gameObject.activeInHierarchy) return;
+        _gameManager.Paused = true;
+        Debug.Log(_gameManager.Paused);
+        _pauseView.Show();
+    }
+    public void Unpause()
+    {
+        if (!_hudView.gameObject.activeInHierarchy) return;
+        _gameManager.Paused = false;
+        _pauseView.Hide();
+    }
+    public void TogglePause(InputAction.CallbackContext context)
+    {
+        if (context.started)
+        {
+            if (!_hudView.gameObject.activeInHierarchy) return;
+            if (_pauseView.gameObject.activeInHierarchy)
+                Unpause();
+            else
+                Pause();
+        }
+    }
+    public void CancelGame()
+    {
+        _gameManager.PlayerManager.ClearPlayers();
+        _gameManager.ObjectGen.ClearObjects();
+        _gameManager.Paused = false;
+        _pauseView.Hide();
+        _hudView.Hide();
+        _setupView.Show();
+    }
+
+
     #endregion
 
     #region GameOver

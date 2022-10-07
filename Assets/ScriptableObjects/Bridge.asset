@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c786887f0d6b71742a1c877e0d5b0bcd, type: 3}
   m_Name: Bridge
   m_EditorClassIdentifier: 
-  Uses: -1
+  Uses: 2
   UsesForce: 0
   ToolPrefab: {fileID: 7397979780619790186, guid: fbd0b2ad7c3e549429162280f92bac73, type: 3}
   ToolIcon: {fileID: 21300000, guid: 443e69e05f86e1f479a1706c9b712c23, type: 3}

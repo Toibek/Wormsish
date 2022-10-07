@@ -153,8 +153,8 @@ public class MenuManager : MonoBehaviour
             _gameManager.SetTeam(_playerSettings[i].Name, _playerSettings[i].Color);
         for (int i = 0; i < _pickups.Count; i++)
         {
-            if (_pickups[i].CurrentState == 1) _gameManager.DroppableTools.Add(_gameManager.AllTools[i]);
-            else if (_pickups[i].CurrentState == 2) _gameManager.InfiniteTools.Add(_gameManager.AllTools[i]);
+            if (_pickups[i].CurrentState == 1) _gameManager.DroppableTools.Add(Instantiate(_gameManager.AllTools[i]));
+            else if (_pickups[i].CurrentState == 2) _gameManager.InfiniteTools.Add(Instantiate(_gameManager.AllTools[i]));
         }
 
 
